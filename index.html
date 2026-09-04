@@ -595,28 +595,35 @@
   // the little pouring spout (katakuchi lip), pointing left
   const spoutAngle = Math.PI;
   const spoutHalfAngle = 0.34;
-  const spoutTipExtra = 50;
+  const spoutTipExtra = 28; // kept within the 480px canvas bounds (cx=240, bowl+rim reaches 206px)
 
   function traceBowlSilhouette(ctx, radius) {
-    // outer boundary of the bowl: a circle with a small flared spout cut into it
+    // outer boundary of the bowl: a circle with a small pointed spout cut into it.
+    // the wall flares outward into rounded "shoulders" then pinches along straight
+    // lines to an actual sharp tip, like a real katakuchi pour spout.
     const a1 = spoutAngle - spoutHalfAngle;
     const a2 = spoutAngle + spoutHalfAngle;
     const x1 = cx + Math.cos(a1) * radius, y1 = cy + Math.sin(a1) * radius;
     const x2 = cx + Math.cos(a2) * radius, y2 = cy + Math.sin(a2) * radius;
+
+    const bulgeR = radius + spoutTipExtra * 0.35;
+    const bulgeHalfAngle = spoutHalfAngle * 0.85;
+    const sh1X = cx + Math.cos(spoutAngle - bulgeHalfAngle) * bulgeR, sh1Y = cy + Math.sin(spoutAngle - bulgeHalfAngle) * bulgeR;
+    const sh2X = cx + Math.cos(spoutAngle + bulgeHalfAngle) * bulgeR, sh2Y = cy + Math.sin(spoutAngle + bulgeHalfAngle) * bulgeR;
+
+    const bulgeCtrlR = radius + spoutTipExtra * 0.18;
+    const c1X = cx + Math.cos(spoutAngle - spoutHalfAngle * 0.95) * bulgeCtrlR, c1Y = cy + Math.sin(spoutAngle - spoutHalfAngle * 0.95) * bulgeCtrlR;
+    const c2X = cx + Math.cos(spoutAngle + spoutHalfAngle * 0.95) * bulgeCtrlR, c2Y = cy + Math.sin(spoutAngle + spoutHalfAngle * 0.95) * bulgeCtrlR;
+
     const tipR = radius + spoutTipExtra;
     const tipX = cx + Math.cos(spoutAngle) * tipR, tipY = cy + Math.sin(spoutAngle) * tipR;
-    // control points sit closer to the centerline than the base points, so the curve
-    // bows out then pinches to a real point at the tip, instead of ballooning into a
-    // rounded bump the whole way
-    const ctrlR = radius + spoutTipExtra * 0.55;
-    const ctrlHalfAngle = spoutHalfAngle * 0.92;
-    const ctrl1X = cx + Math.cos(spoutAngle - ctrlHalfAngle) * ctrlR, ctrl1Y = cy + Math.sin(spoutAngle - ctrlHalfAngle) * ctrlR;
-    const ctrl2X = cx + Math.cos(spoutAngle + ctrlHalfAngle) * ctrlR, ctrl2Y = cy + Math.sin(spoutAngle + ctrlHalfAngle) * ctrlR;
 
     ctx.beginPath();
     ctx.moveTo(x1, y1);
-    ctx.quadraticCurveTo(ctrl1X, ctrl1Y, tipX, tipY);
-    ctx.quadraticCurveTo(ctrl2X, ctrl2Y, x2, y2);
+    ctx.quadraticCurveTo(c1X, c1Y, sh1X, sh1Y);
+    ctx.lineTo(tipX, tipY);
+    ctx.lineTo(sh2X, sh2Y);
+    ctx.quadraticCurveTo(c2X, c2Y, x2, y2);
     ctx.arc(cx, cy, radius, a2, a1 + Math.PI * 2, false);
     ctx.closePath();
   }
