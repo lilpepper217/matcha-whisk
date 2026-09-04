@@ -346,7 +346,7 @@
 
   .cup-wrap svg { width: 100%; height: auto; display: block; overflow: visible; }
 
-  .latte-pour-btn, .latte-replay-btn {
+  .latte-replay-btn {
     background: var(--matcha-deep);
     color: white;
     border: none;
@@ -357,9 +357,23 @@
     font-weight: 600;
   }
 
-  .latte-pour-btn:hover, .latte-replay-btn:hover { background: var(--matcha-bright); }
+  .latte-replay-btn:hover { background: var(--matcha-bright); }
 
-  .latte-pour-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .latte-pour-bowl {
+    all: unset;
+    cursor: pointer;
+    display: block;
+    margin: 14px auto 0;
+    animation: latteBowlNudge 1.8s ease-in-out infinite;
+    transition: filter 0.2s ease;
+  }
+  .latte-pour-bowl:hover { filter: drop-shadow(0 5px 10px rgba(111,147,70,.5)) brightness(1.05); }
+  .latte-pour-bowl:disabled { opacity: 0.35; cursor: not-allowed; animation: none; }
+
+  @keyframes latteBowlNudge {
+    0%, 100% { transform: rotate(0deg) translateY(0); }
+    50% { transform: rotate(-6deg) translateY(-5px); }
+  }
 
   /* --- mockup parity: tin/chashaku motion, kettle pour fx, result compare/hint --- */
   #tinImage.tin-photo {
@@ -667,7 +681,13 @@
         <ellipse cx="50" cy="20" rx="28" ry="7" fill="#eef6fa" fill-opacity="0.55" stroke="#3f3a2e" stroke-width="4"/>
       </svg>
       </div>
-      <button class="latte-pour-btn" id="pourMatchaBtn">Pour in the matcha</button>
+      <button class="latte-pour-bowl" id="pourMatchaBtn" title="Tap the bowl to pour the matcha in">
+        <svg viewBox="0 0 96 64" width="72" height="48" xmlns="http://www.w3.org/2000/svg">
+          <path d="M8 18h72c0 22-16 34-36 34S8 40 8 18z" fill="#efe7d3" stroke="#3f3a2e" stroke-width="2.8" stroke-linejoin="round"/>
+          <ellipse cx="44" cy="18" rx="36" ry="10" fill="#6f9346" stroke="#3f3a2e" stroke-width="2.8"/>
+          <ellipse cx="44" cy="17" rx="24" ry="6" fill="#a9c583" opacity="0.85"/>
+        </svg>
+      </button>
     </div>
 
     <div id="latteDonePhase" style="display:none;">
@@ -1521,11 +1541,12 @@
     playPour();
     latteSelectPhase.style.display = 'none';
     lattePourPhase.style.display = '';
-    lattePourNote.textContent = `${opt.name} syrup first. Now pour in the matcha.`;
+    lattePourNote.textContent = `${opt.name} syrup first. Tap the bowl to pour the matcha in.`;
   }
 
   function pourLatteMatcha() {
     pourMatchaBtn.disabled = true;
+    lattePourNote.textContent = 'pouring...';
     layerMilk.style.transition = 'y 0.6s ease, height 0.6s ease';
     layerMilk.setAttribute('y', 46);
     layerMilk.setAttribute('height', 27);
