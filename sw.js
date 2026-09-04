@@ -2,7 +2,7 @@
 // Everything the game needs (styles, script, tin images) is inlined in index.html,
 // so caching just these few files is enough to play fully offline.
 
-const CACHE_NAME = 'matcha-whisk-v14';
+const CACHE_NAME = 'matcha-whisk-v17';
 const FILES_TO_CACHE = [
   './index.html',
   './manifest.json',
