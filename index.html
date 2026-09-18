@@ -13,7 +13,25 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
-html,body{margin:0;padding:0;background:#e6dfcc}
+:root{
+  --mw-bg-page:#e6dfcc; --mw-bg-app:#f2ead6;
+  --mw-grad-1:#f7f1e1; --mw-grad-2:#efe5cd; --mw-grad-3:#e9dec2;
+  --mw-text:#3f3a2e; --mw-text-secondary:#4a4436; --mw-text-muted:#6b6350; --mw-text-faint:#8a7449;
+  --mw-card-bg:#faf4e4; --mw-chip-bg:#efe7cf; --mw-chip-border:#ddd0ac; --mw-border-muted:#b8a578;
+  --mw-tin-label:#9a8f74; --mw-warn:#b5432f;
+  --mw-feedback-ok-bg:#e3ecd8; --mw-feedback-ok-text:#3f5a38;
+  --mw-feedback-bad-bg:#f4ded6; --mw-feedback-bad-text:#9c4a30;
+}
+:root[data-theme="dark"]{
+  --mw-bg-page:#1c1a15; --mw-bg-app:#242019;
+  --mw-grad-1:#2b2620; --mw-grad-2:#211d18; --mw-grad-3:#191713;
+  --mw-text:#ece5d3; --mw-text-secondary:#d8cfb8; --mw-text-muted:#b5aa8c; --mw-text-faint:#a6976f;
+  --mw-card-bg:#2f2a21; --mw-chip-bg:#352f24; --mw-chip-border:#4a4131; --mw-border-muted:#5c5138;
+  --mw-tin-label:#8d8267; --mw-warn:#e2695a;
+  --mw-feedback-ok-bg:#2c3524; --mw-feedback-ok-text:#a9d18e;
+  --mw-feedback-bad-bg:#3a2a22; --mw-feedback-bad-text:#e2937f;
+}
+html,body{margin:0;padding:0;background:var(--mw-bg-page)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 a{color:#4a6741}a:hover{color:#3a5233}
 @keyframes mwFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
@@ -31,9 +49,11 @@ a{color:#4a6741}a:hover{color:#3a5233}
 @keyframes mwWobble{0%,100%{transform:rotate(-19deg)}50%{transform:rotate(-24deg)}}
 </style>
 </helmet>
-<div style="width:393px;height:852px;position:relative;overflow:hidden;background:#f2ead6;font-family:'EB Garamond',Georgia,serif;color:#3f3a2e;user-select:none">
+<div style="width:393px;height:852px;position:relative;overflow:hidden;background:var(--mw-bg-app);font-family:'EB Garamond',Georgia,serif;color:var(--mw-text);user-select:none">
 
-  <div style="position:absolute;inset:0;background:radial-gradient(120% 80% at 50% 0%,#f7f1e1 0%,#efe5cd 70%,#e9dec2 100%)"></div>
+  <div style="position:absolute;inset:0;background:radial-gradient(120% 80% at 50% 0%,var(--mw-grad-1) 0%,var(--mw-grad-2) 70%,var(--mw-grad-3) 100%)"></div>
+
+  <button onClick="{{ toggleTheme }}" aria-label="Toggle dark mode" style="all:unset;cursor:pointer;position:absolute;top:14px;right:14px;z-index:30;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--mw-card-bg);border:1.6px solid var(--mw-text);color:var(--mw-text);font-size:15px;line-height:1;transition:transform .15s ease" style-hover="transform:translateY(-2px)">{{ themeIcon }}</button>
 
   <div style="position:relative;height:100%;display:flex;flex-direction:column;align-items:center;padding:34px 22px 22px">
 
@@ -45,22 +65,22 @@ a{color:#4a6741}a:hover{color:#3a5233}
 
     <h1 style="margin:2px 0 0;font-size:44px;font-weight:400;letter-spacing:-.5px;line-height:1.05">{{ heading }}</h1>
 
-    <p style="margin:10px 0 0;text-align:center;font-size:16.5px;line-height:1.42;max-width:300px;color:#4a4436;text-wrap:pretty">{{ subhead }}</p>
+    <p style="margin:10px 0 0;text-align:center;font-size:16.5px;line-height:1.42;max-width:300px;color:var(--mw-text-secondary);text-wrap:pretty">{{ subhead }}</p>
 
-    <p style="margin:26px 0 0;min-height:40px;text-align:center;font-family:'Space Mono',monospace;font-size:12.5px;font-weight:700;line-height:1.55;letter-spacing:.1px;max-width:290px;color:#3f3a2e;animation:mwFade .4s ease both">{{ instruction }}</p>
+    <p style="margin:26px 0 0;min-height:40px;text-align:center;font-family:'Space Mono',monospace;font-size:12.5px;font-weight:700;line-height:1.55;letter-spacing:.1px;max-width:290px;color:var(--mw-text);animation:mwFade .4s ease both">{{ instruction }}</p>
 
     <sc-if value="{{ isModeSelect }}" hint-placeholder-val="{{ false }}">
       <div style="margin-top:24px;display:flex;flex-direction:column;gap:16px;width:100%;max-width:280px">
-        <button onClick="{{ chooseCalm }}" style="all:unset;cursor:pointer;padding:18px 20px;border-radius:20px;background:#faf4e4;border:2px solid #3f3a2e;text-align:center;transition:transform .15s ease" style-hover="transform:translateY(-3px)">
+        <button onClick="{{ chooseCalm }}" style="all:unset;cursor:pointer;padding:18px 20px;border-radius:20px;background:var(--mw-card-bg);border:2px solid var(--mw-text);text-align:center;transition:transform .15s ease" style-hover="transform:translateY(-3px)">
           <div style="font-size:20px;font-weight:400">Calm Whisk</div>
-          <div style="margin-top:6px;font-family:'Space Mono',monospace;font-size:11px;color:#6b6350">whisk by feel, no clock</div>
+          <div style="margin-top:6px;font-family:'Space Mono',monospace;font-size:11px;color:var(--mw-text-muted)">whisk by feel, no clock</div>
         </button>
         <button onClick="{{ chooseRush }}" style="all:unset;cursor:pointer;padding:18px 20px;border-radius:20px;background:#4a6741;color:#f7f1e1;text-align:center;box-shadow:0 3px 0 #35492f;transition:transform .12s ease" style-hover="background:#3f5a38" style-active="transform:translateY(2px);box-shadow:0 1px 0 #35492f">
           <div style="font-size:20px;font-weight:400">Order Rush</div>
           <div style="margin-top:6px;font-family:'Space Mono',monospace;font-size:11px;opacity:.85">serve as many orders as you can in 30s</div>
         </button>
         <sc-if value="{{ hasRushBest }}" hint-placeholder-val="{{ false }}">
-          <div style="text-align:center;font-family:'Space Mono',monospace;font-size:10.5px;color:#8a7449">best run: {{ rushBest }} orders</div>
+          <div style="text-align:center;font-family:'Space Mono',monospace;font-size:10.5px;color:var(--mw-text-faint)">best run: {{ rushBest }} orders</div>
         </sc-if>
       </div>
     </sc-if>
@@ -99,7 +119,7 @@ a{color:#4a6741}a:hover{color:#3a5233}
           <sc-if value="{{ isOgura }}" hint-placeholder-val="{{ false }}"><img src="uploads/tin_ogura.png" alt="" style="display:block;height:82px;width:auto;transform-origin:50% 100%;transition:transform .45s cubic-bezier(.34,1.4,.64,1);transform:{{ lidTransform }};filter:drop-shadow(0 5px 4px rgba(138,116,73,.3))"></sc-if>
           <sc-if value="{{ isRocky }}" hint-placeholder-val="{{ false }}"><img src="uploads/tin_rocket.png" alt="" style="display:block;height:82px;width:auto;transform-origin:50% 100%;transition:transform .45s cubic-bezier(.34,1.4,.64,1);transform:{{ lidTransform }};filter:drop-shadow(0 5px 4px rgba(138,116,73,.3))"></sc-if>
           <sc-if value="{{ isNami }}" hint-placeholder-val="{{ false }}"><img src="uploads/tin_yame.png" alt="" style="display:block;height:82px;width:auto;transform-origin:50% 100%;transition:transform .45s cubic-bezier(.34,1.4,.64,1);transform:{{ lidTransform }};filter:drop-shadow(0 5px 4px rgba(138,116,73,.3))"></sc-if>
-          <span style="font-family:'Space Mono',monospace;font-size:10px;font-weight:700;color:#9a8f74">Tin</span>
+          <span style="font-family:'Space Mono',monospace;font-size:10px;font-weight:700;color:var(--mw-tin-label)">Tin</span>
         </button>
 
         <button onClick="{{ tapChashaku }}" style="all:unset;cursor:pointer;position:absolute;right:6px;top:6px;width:96px;z-index:{{ chashakuZ }};display:flex;flex-direction:column;align-items:center;gap:4px;transition:opacity .4s ease;opacity:{{ chashakuOpacity }}">
@@ -148,11 +168,11 @@ a{color:#4a6741}a:hover{color:#3a5233}
           <div style="position:absolute;left:0;right:0;top:80px;display:flex;align-items:center;justify-content:center;gap:14px">
             <span style="font-family:'Space Mono',monospace;font-size:14px;font-weight:700;letter-spacing:.5px;color:{{ secondsColor }};transition:color .3s ease">{{ seconds }}s</span>
             <sc-if value="{{ hintDocked }}" hint-placeholder-val="{{ false }}">
-              <div style="display:flex;align-items:center;gap:7px;padding:5px 10px 5px 7px;border-radius:20px;background:#efe7cf;border:1.4px solid #ddd0ac;animation:mwFade .35s ease both">
-                <div style="width:22px;height:22px;border-radius:50%;border:1.8px solid #3f3a2e;background:{{ yourColor }}"></div>
-                <span style="font-family:'Space Mono',monospace;font-size:9.5px;color:#8a7449">vs</span>
-                <div style="width:22px;height:22px;border-radius:50%;border:1.8px solid #3f3a2e;background:{{ targetColor }};box-shadow:0 0 0 3px rgba(184,165,120,.35)"></div>
-                <span style="font-family:'Space Mono',monospace;font-size:9.5px;font-weight:700;color:#6b6350">target</span>
+              <div style="display:flex;align-items:center;gap:7px;padding:5px 10px 5px 7px;border-radius:20px;background:var(--mw-chip-bg);border:1.4px solid var(--mw-chip-border);animation:mwFade .35s ease both">
+                <div style="width:22px;height:22px;border-radius:50%;border:1.8px solid var(--mw-text);background:{{ yourColor }}"></div>
+                <span style="font-family:'Space Mono',monospace;font-size:9.5px;color:var(--mw-text-faint)">vs</span>
+                <div style="width:22px;height:22px;border-radius:50%;border:1.8px solid var(--mw-text);background:{{ targetColor }};box-shadow:0 0 0 3px rgba(184,165,120,.35)"></div>
+                <span style="font-family:'Space Mono',monospace;font-size:9.5px;font-weight:700;color:var(--mw-text-muted)">target</span>
               </div>
             </sc-if>
           </div>
@@ -236,31 +256,31 @@ a{color:#4a6741}a:hover{color:#3a5233}
 
         <div style="display:flex;align-items:center;justify-content:center;gap:18px;margin-bottom:10px">
           <span style="font-family:'Space Mono',monospace;font-size:15px;font-weight:700;color:{{ rushSecondsColor }}">{{ rushSeconds }}s</span>
-          <span style="font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:#6b6350">orders: {{ rushScore }}</span>
+          <span style="font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:var(--mw-text-muted)">orders: {{ rushScore }}</span>
         </div>
 
         <sc-if value="{{ hasRushFeedback }}" hint-placeholder-val="{{ false }}">
           <div style="margin-bottom:8px;padding:6px 14px;border-radius:14px;background:{{ rushFeedbackBg }};color:{{ rushFeedbackColor }};font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;text-align:center;animation:mwFade .25s ease both">{{ rushFeedbackText }}</div>
         </sc-if>
 
-        <div style="display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:8px;padding:10px 16px;border-radius:18px;background:#faf4e4;border:2px solid #3f3a2e">
+        <div style="display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:8px;padding:10px 16px;border-radius:18px;background:var(--mw-card-bg);border:2px solid var(--mw-text)">
           <sc-if value="{{ curIsIsuzu }}" hint-placeholder-val="{{ false }}"><img src="uploads/tin_isuzu.png" alt="" style="display:block;height:56px;width:auto"></sc-if>
           <sc-if value="{{ curIsOgura }}" hint-placeholder-val="{{ false }}"><img src="uploads/tin_ogura.png" alt="" style="display:block;height:56px;width:auto"></sc-if>
           <sc-if value="{{ curIsRocky }}" hint-placeholder-val="{{ false }}"><img src="uploads/tin_rocket.png" alt="" style="display:block;height:56px;width:auto"></sc-if>
           <sc-if value="{{ curIsNami }}" hint-placeholder-val="{{ false }}"><img src="uploads/tin_yame.png" alt="" style="display:block;height:56px;width:auto"></sc-if>
           <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
-            <span style="font-family:'Space Mono',monospace;font-size:8px;color:#8a7449">froth</span>
-            <div style="width:22px;height:22px;border-radius:50%;border:1.6px solid #3f3a2e;background:{{ curTargetColor }}"></div>
+            <span style="font-family:'Space Mono',monospace;font-size:8px;color:var(--mw-text-faint)">froth</span>
+            <div style="width:22px;height:22px;border-radius:50%;border:1.6px solid var(--mw-text);background:{{ curTargetColor }}"></div>
           </div>
           <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
-            <span style="font-family:'Space Mono',monospace;font-size:8px;color:#8a7449">syrup</span>
-            <div style="width:22px;height:22px;border-radius:50%;border:1.6px solid #3f3a2e;background:{{ curSyrupColor }}"></div>
+            <span style="font-family:'Space Mono',monospace;font-size:8px;color:var(--mw-text-faint)">syrup</span>
+            <div style="width:22px;height:22px;border-radius:50%;border:1.6px solid var(--mw-text);background:{{ curSyrupColor }}"></div>
           </div>
         </div>
 
         <sc-if value="{{ hasNextOrder }}" hint-placeholder-val="{{ false }}">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;opacity:.55">
-            <span style="font-family:'Space Mono',monospace;font-size:9px;color:#8a7449">next:</span>
+            <span style="font-family:'Space Mono',monospace;font-size:9px;color:var(--mw-text-faint)">next:</span>
             <sc-if value="{{ nextIsIsuzu }}" hint-placeholder-val="{{ false }}"><img src="uploads/tin_isuzu.png" alt="" style="display:block;height:28px;width:auto"></sc-if>
             <sc-if value="{{ nextIsOgura }}" hint-placeholder-val="{{ false }}"><img src="uploads/tin_ogura.png" alt="" style="display:block;height:28px;width:auto"></sc-if>
             <sc-if value="{{ nextIsRocky }}" hint-placeholder-val="{{ false }}"><img src="uploads/tin_rocket.png" alt="" style="display:block;height:28px;width:auto"></sc-if>
@@ -275,7 +295,7 @@ a{color:#4a6741}a:hover{color:#3a5233}
             <button onClick="{{ pickRush2 }}" style="all:unset;cursor:pointer;padding:4px;border-radius:12px" style-hover="transform:translateY(-2px)"><img src="uploads/tin_rocket.png" alt="" style="display:block;height:52px;width:auto;filter:drop-shadow(0 3px 3px rgba(138,116,73,.28))"></button>
             <button onClick="{{ pickRush3 }}" style="all:unset;cursor:pointer;padding:4px;border-radius:12px" style-hover="transform:translateY(-2px)"><img src="uploads/tin_yame.png" alt="" style="display:block;height:52px;width:auto;filter:drop-shadow(0 3px 3px rgba(138,116,73,.28))"></button>
           </div>
-          <div style="font-family:'Space Mono',monospace;font-size:10.5px;color:#8a7449">tap a tin to start whisking</div>
+          <div style="font-family:'Space Mono',monospace;font-size:10.5px;color:var(--mw-text-faint)">tap a tin to start whisking</div>
         </sc-if>
 
         <sc-if value="{{ isRushWhisk }}" hint-placeholder-val="{{ false }}">
@@ -312,7 +332,7 @@ a{color:#4a6741}a:hover{color:#3a5233}
               <path d="M53 42l-5 146" stroke="#fff" stroke-width="5" opacity=".5" stroke-linecap="round"></path>
             </svg>
           </div>
-          <div style="font-family:'Space Mono',monospace;font-size:10.5px;color:#8a7449;margin-bottom:6px">pick the syrup this order calls for</div>
+          <div style="font-family:'Space Mono',monospace;font-size:10.5px;color:var(--mw-text-faint);margin-bottom:6px">pick the syrup this order calls for</div>
           <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:8px">
             <button onClick="{{ pickRushSyrup0 }}" style="all:unset;cursor:pointer;padding:3px;border-radius:12px;border:{{ syrup0Border }};opacity:{{ pourBtnOpacity }};pointer-events:{{ pourBtnEvents }}" style-hover="transform:translateY(-2px)">
               <svg viewBox="0 0 52 52" width="30" height="30"><ellipse cx="26" cy="49" rx="12" ry="2.6" fill="#8a7449" opacity=".22"></ellipse><path d="M26 46c-9-4-14-12-14-20 0-6 6-10 14-10s14 4 14 10c0 8-5 16-14 20z" fill="#e0464b" stroke="#3f3a2e" stroke-width="2.4" stroke-linejoin="round"></path><circle cx="21" cy="26" r="1.7" fill="#ffe9b0"></circle><circle cx="31" cy="24" r="1.7" fill="#ffe9b0"></circle><circle cx="26" cy="34" r="1.7" fill="#ffe9b0"></circle><circle cx="34" cy="33" r="1.7" fill="#ffe9b0"></circle><circle cx="18" cy="34" r="1.7" fill="#ffe9b0"></circle><path d="M26 16c-6-2-11-1-13 2 4 3 9 3 13 1zm0 0c6-2 11-1 13 2-4 3-9 3-13 1z" fill="#5f8f43" stroke="#3f3a2e" stroke-width="2.2" stroke-linejoin="round"></path><path d="M26 16V9" stroke="#3f3a2e" stroke-width="2.4" stroke-linecap="round"></path><path d="M20 27c1-4 4-7 7-8" fill="none" stroke="#fff" stroke-width="2.2" opacity=".4" stroke-linecap="round"></path></svg>
@@ -333,29 +353,29 @@ a{color:#4a6741}a:hover{color:#3a5233}
 
   <sc-if value="{{ showResult }}" hint-placeholder-val="{{ false }}">
     <div style="position:absolute;inset:0;background:rgba(63,58,46,.28);backdrop-filter:blur(2px);display:flex;align-items:center;justify-content:center;padding:26px;animation:mwFade .3s ease both">
-      <div style="width:100%;background:#faf4e4;border:2.6px solid #3f3a2e;border-radius:26px;padding:26px 22px;text-align:center;box-shadow:0 10px 0 rgba(63,58,46,.16);animation:mwPop .35s cubic-bezier(.34,1.4,.64,1) both">
+      <div style="width:100%;background:var(--mw-card-bg);border:2.6px solid var(--mw-text);border-radius:26px;padding:26px 22px;text-align:center;box-shadow:0 10px 0 rgba(63,58,46,.16);animation:mwPop .35s cubic-bezier(.34,1.4,.64,1) both">
         <div style="font-family:'Space Mono',monospace;font-size:23px;font-weight:700;letter-spacing:-.4px">{{ resultTitle }}</div>
-        <p style="margin:14px 0 0;font-family:'Space Mono',monospace;font-size:13px;line-height:1.6;color:#4a4436;text-wrap:pretty">{{ resultNote }}</p>
+        <p style="margin:14px 0 0;font-family:'Space Mono',monospace;font-size:13px;line-height:1.6;color:var(--mw-text-secondary);text-wrap:pretty">{{ resultNote }}</p>
 
         <sc-if value="{{ showCompare }}" hint-placeholder-val="{{ false }}">
           <div style="margin-top:18px;display:flex;gap:14px;justify-content:center">
-            <div style="display:flex;flex-direction:column;gap:6px;align-items:center"><div style="width:66px;height:66px;border-radius:50%;border:2.4px solid #3f3a2e;background:{{ yourColor }}"></div><span style="font-family:'Space Mono',monospace;font-size:10px;color:#6b6350">yours</span></div>
-            <div style="display:flex;flex-direction:column;gap:6px;align-items:center"><div style="width:66px;height:66px;border-radius:50%;border:2.4px solid #3f3a2e;background:{{ targetColor }}"></div><span style="font-family:'Space Mono',monospace;font-size:10px;color:#6b6350">target</span></div>
+            <div style="display:flex;flex-direction:column;gap:6px;align-items:center"><div style="width:66px;height:66px;border-radius:50%;border:2.4px solid var(--mw-text);background:{{ yourColor }}"></div><span style="font-family:'Space Mono',monospace;font-size:10px;color:var(--mw-text-muted)">yours</span></div>
+            <div style="display:flex;flex-direction:column;gap:6px;align-items:center"><div style="width:66px;height:66px;border-radius:50%;border:2.4px solid var(--mw-text);background:{{ targetColor }}"></div><span style="font-family:'Space Mono',monospace;font-size:10px;color:var(--mw-text-muted)">target</span></div>
           </div>
         </sc-if>
 
         <sc-if value="{{ showHint }}" hint-placeholder-val="{{ false }}">
-          <div style="margin-top:18px;padding:14px;border-radius:16px;background:#efe7cf;border:1.6px dashed #b8a578;animation:mwFade .3s ease both">
-            <div style="font-family:'Space Mono',monospace;font-size:10.5px;letter-spacing:.6px;text-transform:uppercase;color:#8a7449">whisk toward this</div>
-            <div style="margin:10px auto 0;width:88px;height:88px;border-radius:50%;border:2.6px solid #3f3a2e;background:{{ targetColor }};box-shadow:inset 0 -8px 16px rgba(0,0,0,.12)"></div>
-            <div style="margin-top:10px;font-family:'Space Mono',monospace;font-size:11.5px;color:#4a4436">match this froth colour</div>
+          <div style="margin-top:18px;padding:14px;border-radius:16px;background:var(--mw-chip-bg);border:1.6px dashed var(--mw-border-muted);animation:mwFade .3s ease both">
+            <div style="font-family:'Space Mono',monospace;font-size:10.5px;letter-spacing:.6px;text-transform:uppercase;color:var(--mw-text-faint)">whisk toward this</div>
+            <div style="margin:10px auto 0;width:88px;height:88px;border-radius:50%;border:2.6px solid var(--mw-text);background:{{ targetColor }};box-shadow:inset 0 -8px 16px rgba(0,0,0,.12)"></div>
+            <div style="margin-top:10px;font-family:'Space Mono',monospace;font-size:11.5px;color:var(--mw-text-secondary)">match this froth colour</div>
           </div>
         </sc-if>
 
         <div style="margin-top:20px;display:flex;flex-direction:column;gap:10px;align-items:center">
           <button onClick="{{ primaryAction }}" style="all:unset;cursor:pointer;padding:13px 24px;border-radius:24px;background:#4a6741;color:#f7f1e1;font-family:'Space Mono',monospace;font-size:13.5px;box-shadow:0 3px 0 #35492f" style-hover="background:#3f5a38" style-active="transform:translateY(2px);box-shadow:0 1px 0 #35492f">{{ primaryLabel }}</button>
           <sc-if value="{{ hintAvailable }}" hint-placeholder-val="{{ false }}">
-            <button onClick="{{ revealHint }}" style="all:unset;cursor:pointer;padding:11px 20px;border-radius:22px;border:2px solid #b8a578;color:#8a7449;font-family:'Space Mono',monospace;font-size:12px" style-hover="background:#efe7cf">Give me a hint</button>
+            <button onClick="{{ revealHint }}" style="all:unset;cursor:pointer;padding:11px 20px;border-radius:22px;border:2px solid var(--mw-border-muted);color:var(--mw-text-faint);font-family:'Space Mono',monospace;font-size:12px" style-hover="background:var(--mw-chip-bg)">Give me a hint</button>
           </sc-if>
         </div>
       </div>
@@ -364,13 +384,13 @@ a{color:#4a6741}a:hover{color:#3a5233}
 
   <sc-if value="{{ showDone }}" hint-placeholder-val="{{ false }}">
     <div style="position:absolute;inset:0;background:rgba(63,58,46,.3);backdrop-filter:blur(2px);display:flex;align-items:center;justify-content:center;padding:26px;animation:mwFade .3s ease both">
-      <div style="width:100%;background:#faf4e4;border:2.6px solid #3f3a2e;border-radius:26px;padding:24px 22px;text-align:center;box-shadow:0 10px 0 rgba(63,58,46,.16);animation:mwPop .35s cubic-bezier(.34,1.4,.64,1) both">
-        <div style="font-family:'Space Mono',monospace;font-size:10.5px;letter-spacing:1px;text-transform:uppercase;color:#8a7449">served</div>
+      <div style="width:100%;background:var(--mw-card-bg);border:2.6px solid var(--mw-text);border-radius:26px;padding:24px 22px;text-align:center;box-shadow:0 10px 0 rgba(63,58,46,.16);animation:mwPop .35s cubic-bezier(.34,1.4,.64,1) both">
+        <div style="font-family:'Space Mono',monospace;font-size:10.5px;letter-spacing:1px;text-transform:uppercase;color:var(--mw-text-faint)">served</div>
         <div style="margin-top:8px;font-size:32px;line-height:1.15">{{ drinkName }}</div>
-        <div style="margin:16px auto 0;width:112px;height:150px;border-radius:10px;background:linear-gradient(#eef3f6,#e3ebef);border:2.4px solid #3f3a2e;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end">
+        <div style="margin:16px auto 0;width:112px;height:150px;border-radius:10px;background:linear-gradient(#eef3f6,#e3ebef);border:2.4px solid var(--mw-text);overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end">
           <div style="height:100%;background:linear-gradient(#7fa552 0%,#6f9346 26%,#a9c98a 40%,#fbfaf6 54%,#fbfaf6 64%,{{ syrupColor }} 86%,{{ syrupColor }} 100%)"></div>
         </div>
-        <p style="margin:16px 0 0;font-family:'Space Mono',monospace;font-size:12px;line-height:1.6;color:#4a4436">Froth {{ frothRounded }} · {{ tinName }} · {{ syrupName }}</p>
+        <p style="margin:16px 0 0;font-family:'Space Mono',monospace;font-size:12px;line-height:1.6;color:var(--mw-text-secondary)">Froth {{ frothRounded }} · {{ tinName }} · {{ syrupName }}</p>
         <button onClick="{{ playAgain }}" style="all:unset;cursor:pointer;margin-top:18px;padding:13px 24px;border-radius:24px;background:#4a6741;color:#f7f1e1;font-family:'Space Mono',monospace;font-size:13.5px;box-shadow:0 3px 0 #35492f" style-hover="background:#3f5a38">Play Again</button>
       </div>
     </div>
@@ -378,13 +398,13 @@ a{color:#4a6741}a:hover{color:#3a5233}
 
   <sc-if value="{{ showRushResult }}" hint-placeholder-val="{{ false }}">
     <div style="position:absolute;inset:0;background:rgba(63,58,46,.3);backdrop-filter:blur(2px);display:flex;align-items:center;justify-content:center;padding:26px;animation:mwFade .3s ease both">
-      <div style="width:100%;background:#faf4e4;border:2.6px solid #3f3a2e;border-radius:26px;padding:24px 22px;text-align:center;box-shadow:0 10px 0 rgba(63,58,46,.16);animation:mwPop .35s cubic-bezier(.34,1.4,.64,1) both">
-        <div style="font-family:'Space Mono',monospace;font-size:10.5px;letter-spacing:1px;text-transform:uppercase;color:#8a7449">time's up</div>
+      <div style="width:100%;background:var(--mw-card-bg);border:2.6px solid var(--mw-text);border-radius:26px;padding:24px 22px;text-align:center;box-shadow:0 10px 0 rgba(63,58,46,.16);animation:mwPop .35s cubic-bezier(.34,1.4,.64,1) both">
+        <div style="font-family:'Space Mono',monospace;font-size:10.5px;letter-spacing:1px;text-transform:uppercase;color:var(--mw-text-faint)">time's up</div>
         <div style="margin-top:8px;font-size:38px;line-height:1.1">{{ rushScore }} orders</div>
-        <p style="margin:12px 0 0;font-family:'Space Mono',monospace;font-size:12px;line-height:1.6;color:#4a4436">{{ rushResultNote }}</p>
+        <p style="margin:12px 0 0;font-family:'Space Mono',monospace;font-size:12px;line-height:1.6;color:var(--mw-text-secondary)">{{ rushResultNote }}</p>
         <div style="margin-top:20px;display:flex;flex-direction:column;gap:10px;align-items:center">
           <button onClick="{{ rushPlayAgain }}" style="all:unset;cursor:pointer;padding:13px 24px;border-radius:24px;background:#4a6741;color:#f7f1e1;font-family:'Space Mono',monospace;font-size:13.5px;box-shadow:0 3px 0 #35492f" style-hover="background:#3f5a38" style-active="transform:translateY(2px);box-shadow:0 1px 0 #35492f">Play Again</button>
-          <button onClick="{{ backToModeSelect }}" style="all:unset;cursor:pointer;padding:11px 20px;border-radius:22px;border:2px solid #b8a578;color:#8a7449;font-family:'Space Mono',monospace;font-size:12px" style-hover="background:#efe7cf">Back to Menu</button>
+          <button onClick="{{ backToModeSelect }}" style="all:unset;cursor:pointer;padding:11px 20px;border-radius:22px;border:2px solid var(--mw-border-muted);color:var(--mw-text-faint);font-family:'Space Mono',monospace;font-size:12px" style-hover="background:var(--mw-chip-bg)">Back to Menu</button>
         </div>
       </div>
     </div>
@@ -490,7 +510,8 @@ class Component extends DCLogic {
     froth:0, seconds:20, attempts:0, showResult:false, showHint:false,
     success:false, target: 55 + Math.random()*35, syrup:null, latteStep:'pick', showDone:false,
     rushOrders:[], rushScore:0, rushSeconds:RUSH_SECONDS, rushActive:false, rushClockRunning:false,
-    rushTin:null, rushSyrup:null, rushBest:0, rushIsNewBest:false, rushFeedback:null
+    rushTin:null, rushSyrup:null, rushBest:0, rushIsNewBest:false, rushFeedback:null,
+    theme:'light'
   };
 
   f = 0; bubbles = []; revs = []; pointer = null; isDown = false;
@@ -520,9 +541,20 @@ class Component extends DCLogic {
     let best = 0;
     try{ best = parseInt(localStorage.getItem('mwRushBest')||'0',10) || 0; }catch(e){}
     if(best) this.setState({ rushBest: best });
+    let theme = 'light';
+    try{ theme = localStorage.getItem('mwTheme') || 'light'; }catch(e){}
+    if(theme==='dark') this.setState({ theme });
+    document.documentElement.setAttribute('data-theme', theme);
     this.ensureLoop();
   }
   componentDidUpdate(){ this.ensureLoop(); }
+  toggleTheme = () => {
+    SFX.tap();
+    const next = this.state.theme==='dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    try{ localStorage.setItem('mwTheme', next); }catch(e){}
+    this.setState({ theme: next });
+  };
   componentWillUnmount(){ cancelAnimationFrame(this.raf); this.raf = null; clearInterval(this.rushTimer); clearTimeout(this.feedbackTimer); clearTimeout(this.pourTimer); }
 
   style(){ return this.props.whiskStyle || 'drag'; }
@@ -906,7 +938,7 @@ class Component extends DCLogic {
       isLatte,
       isRush,
       rushSeconds: s.rushSeconds,
-      rushSecondsColor: s.rushSeconds<=5 ? '#b5432f' : '#6b6350',
+      rushSecondsColor: s.rushSeconds<=5 ? 'var(--mw-warn)' : 'var(--mw-text-muted)',
       rushScore: s.rushScore,
       curIsIsuzu: !!curTin && curTin.id==='isuzu',
       curIsOgura: !!curTin && curTin.id==='ogura',
@@ -935,14 +967,14 @@ class Component extends DCLogic {
       rushMatchaTop: st==='rushPouring' ? 46 : 260,
       hasRushFeedback: !!s.rushFeedback,
       rushFeedbackText: s.rushFeedback ? s.rushFeedback.text : '',
-      rushFeedbackBg: s.rushFeedback && s.rushFeedback.ok ? '#e3ecd8' : '#f4ded6',
-      rushFeedbackColor: s.rushFeedback && s.rushFeedback.ok ? '#3f5a38' : '#9c4a30',
+      rushFeedbackBg: s.rushFeedback && s.rushFeedback.ok ? 'var(--mw-feedback-ok-bg)' : 'var(--mw-feedback-bad-bg)',
+      rushFeedbackColor: s.rushFeedback && s.rushFeedback.ok ? 'var(--mw-feedback-ok-text)' : 'var(--mw-feedback-bad-text)',
       showRushResult: s.screen==='rushResult',
       rushResultNote: s.rushIsNewBest ? 'A new best run!' : ('Best run: '+(s.rushBest||0)+' orders.'),
       rushPlayAgain:this.rushPlayAgain,
       backToModeSelect:this.backToModeSelect,
       seconds: s.seconds,
-      secondsColor: s.seconds <= 5 ? '#b5432f' : '#6b6350',
+      secondsColor: s.seconds <= 5 ? 'var(--mw-warn)' : 'var(--mw-text-muted)',
       canvasRef: (el)=>{ this.canvas = el; if(el) this.ensureLoop(); },
       bowlCursor: st==='whisk' ? 'grab' : 'default',
       pick0:this.pick(0), pick1:this.pick(1), pick2:this.pick(2), pick3:this.pick(3),
@@ -953,10 +985,10 @@ class Component extends DCLogic {
       chashakuOpacity: st==='scoop' ? 1 : .35,
       chashakuZ: s.scooping ? 6 : 1,
       chashakuTransform: s.scooping ? 'translate(-40px,150px) rotate(38deg)' : 'none',
-      chashakuLabel: st==='scoop' ? '#3f3a2e' : '#9a8f74',
+      chashakuLabel: st==='scoop' ? 'var(--mw-text)' : 'var(--mw-tin-label)',
       kettleOpacity: s.pouring ? 0 : (st==='pour' ? 1 : .35),
       kettleTransform: 'none',
-      kettleLabel: (st==='pour'||st==='pouring') ? '#3f3a2e' : '#9a8f74',
+      kettleLabel: (st==='pour'||st==='pouring') ? 'var(--mw-text)' : 'var(--mw-tin-label)',
       pouring: s.pouring,
       tapTin:this.tapTin, tapChashaku:this.tapChashaku, tapKettle:this.tapKettle,
       down:this.down, move:this.move, up:this.up, finish:this.finish,
@@ -990,7 +1022,9 @@ class Component extends DCLogic {
       bowlNudge: step==='poured' ? 'mwBowlNudge 1.8s ease-in-out infinite' : 'none',
       showDone: s.showDone && s.mode!=='rush',
       drinkName: syrup.drink,
-      playAgain:this.playAgain
+      playAgain:this.playAgain,
+      toggleTheme:this.toggleTheme,
+      themeIcon: s.theme==='dark' ? '☀' : '☾'
     };
   }
 }
