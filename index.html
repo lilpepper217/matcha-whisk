@@ -416,6 +416,7 @@ const frothColor = v => mix('#3a5233','#c2d6a4',Math.max(0,Math.min(1,v/100)));
 
 const RUSH_SECONDS = 40;
 const RUSH_TOLERANCE = 15;
+const RUSH_FEEDBACK_MS = 2400;
 function makeOrder(){
   const tin = TINS[Math.floor(Math.random()*TINS.length)];
   const syrup = SYRUPS[Math.floor(Math.random()*SYRUPS.length)];
@@ -677,6 +678,16 @@ class Component extends DCLogic {
 
   goToPour = () => {
     if(!this.state.rushActive || this.state.stage!=='whisk') return;
+    const order = this.state.rushOrders[0];
+    if(!order) return;
+    const diff = Math.abs(this.state.froth - order.target);
+    if(diff > RUSH_TOLERANCE){
+      clearTimeout(this.feedbackTimer);
+      const feedback = { ok:false, text: this.state.froth < order.target ? 'Not quite — froth too thin, keep whisking.' : 'Not quite — froth too thick, keep whisking.' };
+      this.setState({ rushFeedback: feedback });
+      this.feedbackTimer = setTimeout(()=>{ this.setState({rushFeedback:null}); }, RUSH_FEEDBACK_MS);
+      return;
+    }
     this.setState({ stage:'rushPour' });
   };
 
@@ -690,11 +701,9 @@ class Component extends DCLogic {
   resolveOrder = () => {
     const order = this.state.rushOrders[0];
     if(!order) return;
-    const diff = Math.abs(this.state.froth - order.target);
     const tinOk = this.state.rushTin===order.tinId;
     const syrupOk = this.state.rushSyrup===order.syrupId;
-    const frothOk = diff<=RUSH_TOLERANCE;
-    const success = tinOk && syrupOk && frothOk;
+    const success = tinOk && syrupOk;
 
     let feedback;
     if(success){
@@ -703,7 +712,6 @@ class Component extends DCLogic {
       const problems = [];
       if(!tinOk) problems.push('wrong tin');
       if(!syrupOk) problems.push('wrong syrup');
-      if(!frothOk) problems.push(this.state.froth < order.target ? 'froth too thin' : 'froth too thick');
       feedback = { ok:false, text: 'Missed it — ' + problems.join(', ') + '.' };
     }
 
@@ -722,7 +730,7 @@ class Component extends DCLogic {
         rushFeedback: feedback
       };
     });
-    this.feedbackTimer = setTimeout(()=>{ this.setState({rushFeedback:null}); }, 1500);
+    this.feedbackTimer = setTimeout(()=>{ this.setState({rushFeedback:null}); }, RUSH_FEEDBACK_MS);
   };
 
   endRush = () => {
