@@ -724,7 +724,8 @@ class Component extends DCLogic {
     this.setState({
       screen:'rush', mode:'rush', stage:'rushPick',
       rushOrders: orders, rushScore:0, rushSeconds:RUSH_SECONDS,
-      rushActive:true, rushClockRunning:false, rushTin:null, rushSyrup:null, froth:0, rushFeedback:null
+      rushActive:true, rushClockRunning:false, rushTin:null, rushSyrup:null, froth:0, rushFeedback:null,
+      showResult:false, showHint:false, success:false, showDone:false
     });
   };
 
@@ -959,7 +960,7 @@ class Component extends DCLogic {
       pouring: s.pouring,
       tapTin:this.tapTin, tapChashaku:this.tapChashaku, tapKettle:this.tapKettle,
       down:this.down, move:this.move, up:this.up, finish:this.finish,
-      showResult: s.showResult,
+      showResult: s.showResult && s.screen==='result',
       resultTitle, resultNote,
       showCompare: !s.success && !s.showHint,
       yourColor: frothColor(s.froth),
@@ -987,7 +988,7 @@ class Component extends DCLogic {
       bowlCursor: step==='poured' ? 'pointer' : 'default',
       bowlHint: step==='poured' ? 'pour the matcha in' : '',
       bowlNudge: step==='poured' ? 'mwBowlNudge 1.8s ease-in-out infinite' : 'none',
-      showDone: s.showDone,
+      showDone: s.showDone && s.mode!=='rush',
       drinkName: syrup.drink,
       playAgain:this.playAgain
     };
