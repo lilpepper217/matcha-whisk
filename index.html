@@ -239,6 +239,10 @@ a{color:#4a6741}a:hover{color:#3a5233}
           <span style="font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:#6b6350">orders: {{ rushScore }}</span>
         </div>
 
+        <sc-if value="{{ hasRushFeedback }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-bottom:8px;padding:6px 14px;border-radius:14px;background:{{ rushFeedbackBg }};color:{{ rushFeedbackColor }};font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;text-align:center;animation:mwFade .25s ease both">{{ rushFeedbackText }}</div>
+        </sc-if>
+
         <div style="display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:8px;padding:10px 16px;border-radius:18px;background:#faf4e4;border:2px solid #3f3a2e">
           <sc-if value="{{ curIsIsuzu }}" hint-placeholder-val="{{ false }}"><img src="uploads/tin_isuzu.png" alt="" style="display:block;height:56px;width:auto"></sc-if>
           <sc-if value="{{ curIsOgura }}" hint-placeholder-val="{{ false }}"><img src="uploads/tin_ogura.png" alt="" style="display:block;height:56px;width:auto"></sc-if>
@@ -391,7 +395,7 @@ class Component extends DCLogic {
     froth:0, seconds:20, attempts:0, showResult:false, showHint:false,
     success:false, target: 55 + Math.random()*35, syrup:null, latteStep:'pick', showDone:false,
     rushOrders:[], rushScore:0, rushSeconds:RUSH_SECONDS, rushActive:false, rushClockRunning:false,
-    rushTin:null, rushSyrup:null, rushBest:0, rushIsNewBest:false
+    rushTin:null, rushSyrup:null, rushBest:0, rushIsNewBest:false, rushFeedback:null
   };
 
   f = 0; bubbles = []; revs = []; pointer = null; isDown = false;
@@ -424,7 +428,7 @@ class Component extends DCLogic {
     this.ensureLoop();
   }
   componentDidUpdate(){ this.ensureLoop(); }
-  componentWillUnmount(){ cancelAnimationFrame(this.raf); this.raf = null; clearInterval(this.rushTimer); }
+  componentWillUnmount(){ cancelAnimationFrame(this.raf); this.raf = null; clearInterval(this.rushTimer); clearTimeout(this.feedbackTimer); }
 
   style(){ return this.props.whiskStyle || 'drag'; }
 
@@ -608,12 +612,13 @@ class Component extends DCLogic {
 
   startRush = () => {
     clearInterval(this.rushTimer);
+    clearTimeout(this.feedbackTimer);
     this.f=0; this.bubbles=[]; this.revs=[];
     const orders = [makeOrder(), makeOrder(), makeOrder()];
     this.setState({
       screen:'rush', mode:'rush', stage:'rushPick',
       rushOrders: orders, rushScore:0, rushSeconds:RUSH_SECONDS,
-      rushActive:true, rushClockRunning:false, rushTin:null, rushSyrup:null, froth:0
+      rushActive:true, rushClockRunning:false, rushTin:null, rushSyrup:null, froth:0, rushFeedback:null
     });
   };
 
@@ -647,8 +652,24 @@ class Component extends DCLogic {
     const order = this.state.rushOrders[0];
     if(!order) return;
     const diff = Math.abs(this.f - order.target);
-    const success = this.state.rushTin===order.tinId && this.state.rushSyrup===order.syrupId && diff<=RUSH_TOLERANCE;
+    const tinOk = this.state.rushTin===order.tinId;
+    const syrupOk = this.state.rushSyrup===order.syrupId;
+    const frothOk = diff<=RUSH_TOLERANCE;
+    const success = tinOk && syrupOk && frothOk;
+
+    let feedback;
+    if(success){
+      feedback = { ok:true, text:'Nice! Order served.' };
+    } else {
+      const problems = [];
+      if(!tinOk) problems.push('wrong tin');
+      if(!syrupOk) problems.push('wrong syrup');
+      if(!frothOk) problems.push(this.f < order.target ? 'froth too thin' : 'froth too thick');
+      feedback = { ok:false, text: 'Missed it — ' + problems.join(', ') + '.' };
+    }
+
     this.f=0; this.bubbles=[]; this.revs=[];
+    clearTimeout(this.feedbackTimer);
     this.setState(s=>{
       const rest = s.rushOrders.slice(1);
       rest.push(makeOrder());
@@ -658,9 +679,11 @@ class Component extends DCLogic {
         rushTin: null,
         rushSyrup: null,
         stage: 'rushPick',
-        froth: 0
+        froth: 0,
+        rushFeedback: feedback
       };
     });
+    this.feedbackTimer = setTimeout(()=>{ this.setState({rushFeedback:null}); }, 1500);
   };
 
   endRush = () => {
@@ -677,8 +700,9 @@ class Component extends DCLogic {
 
   backToModeSelect = () => {
     clearInterval(this.rushTimer);
+    clearTimeout(this.feedbackTimer);
     this.f=0; this.bubbles=[]; this.revs=[];
-    this.setState({ screen:'modeSelect', mode:null, rushActive:false, stage:'tin' });
+    this.setState({ screen:'modeSelect', mode:null, rushActive:false, stage:'tin', rushFeedback:null });
   };
 
   renderVals(){
@@ -774,6 +798,10 @@ class Component extends DCLogic {
       syrup2Border: pickedBorder(s.rushSyrup==='mango'),
       serveOrder:this.serveOrder,
       serveOpacity: st==='whisk' ? 1 : 0.4,
+      hasRushFeedback: !!s.rushFeedback,
+      rushFeedbackText: s.rushFeedback ? s.rushFeedback.text : '',
+      rushFeedbackBg: s.rushFeedback && s.rushFeedback.ok ? '#e3ecd8' : '#f4ded6',
+      rushFeedbackColor: s.rushFeedback && s.rushFeedback.ok ? '#3f5a38' : '#9c4a30',
       showRushResult: s.screen==='rushResult',
       rushResultNote: s.rushIsNewBest ? 'A new best run!' : ('Best run: '+(s.rushBest||0)+' orders.'),
       rushPlayAgain:this.rushPlayAgain,
