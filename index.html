@@ -423,6 +423,67 @@ function makeOrder(){
   return { tinId: tin.id, syrupId: syrup.id, target: 30 + Math.random()*60 };
 }
 
+let _actx = null;
+function actx(){
+  if(_actx) return _actx;
+  try{ _actx = new (window.AudioContext || window.webkitAudioContext)(); }catch(e){ _actx = null; }
+  return _actx;
+}
+
+function sfxTone(freq, start, dur, opts){
+  opts = opts || {};
+  const a = actx(); if(!a) return;
+  if(a.state==='suspended') a.resume().catch(()=>{});
+  const type = opts.type || 'sine', peak = opts.peak!=null ? opts.peak : 0.16;
+  const attack = opts.attack!=null ? opts.attack : 0.008, decay = opts.decay!=null ? opts.decay : 0.12;
+  const t0 = a.currentTime + start;
+  const osc = a.createOscillator(), gain = a.createGain();
+  osc.type = type;
+  osc.frequency.setValueAtTime(freq, t0);
+  if(opts.sweepTo!=null) osc.frequency.exponentialRampToValueAtTime(Math.max(1,opts.sweepTo), t0+dur);
+  gain.gain.setValueAtTime(0.0001, t0);
+  gain.gain.exponentialRampToValueAtTime(peak, t0+attack);
+  gain.gain.exponentialRampToValueAtTime(0.0001, t0+attack+decay);
+  osc.connect(gain).connect(a.destination);
+  try{ osc.start(t0); osc.stop(t0+attack+decay+0.03); }catch(e){}
+}
+
+function sfxNoise(start, dur, opts){
+  opts = opts || {};
+  const a = actx(); if(!a) return;
+  if(a.state==='suspended') a.resume().catch(()=>{});
+  const peak = opts.peak!=null ? opts.peak : 0.12;
+  const filterFreq = opts.filterFreq!=null ? opts.filterFreq : 1200;
+  const filterQ = opts.filterQ!=null ? opts.filterQ : 0.7;
+  const filterType = opts.type || 'bandpass';
+  const t0 = a.currentTime + start;
+  const bufferSize = Math.max(1, Math.floor(a.sampleRate*dur));
+  const buffer = a.createBuffer(1, bufferSize, a.sampleRate);
+  const data = buffer.getChannelData(0);
+  for(let i=0;i<bufferSize;i++) data[i] = Math.random()*2-1;
+  const src = a.createBufferSource(); src.buffer = buffer;
+  const filt = a.createBiquadFilter();
+  filt.type = filterType;
+  filt.frequency.setValueAtTime(filterFreq, t0);
+  if(opts.sweepTo!=null) filt.frequency.exponentialRampToValueAtTime(Math.max(60,opts.sweepTo), t0+dur);
+  filt.Q.value = filterQ;
+  const gain = a.createGain();
+  gain.gain.setValueAtTime(0.0001, t0);
+  gain.gain.exponentialRampToValueAtTime(peak, t0+0.01);
+  gain.gain.exponentialRampToValueAtTime(0.0001, t0+dur);
+  src.connect(filt).connect(gain).connect(a.destination);
+  try{ src.start(t0); src.stop(t0+dur+0.03); }catch(e){}
+}
+
+const SFX = {
+  tap(){ sfxTone(520, 0, 0.07, {type:'sine', peak:0.13, attack:0.004, decay:0.06}); },
+  whisk(){ sfxNoise(0, 0.05, {peak:0.05, filterFreq:1800, filterQ:0.6, type:'bandpass'}); },
+  pour(){ sfxNoise(0, 0.65, {peak:0.09, filterFreq:2400, filterQ:0.5, sweepTo:220, type:'lowpass'}); },
+  success(){ sfxTone(660,0,0.13,{type:'sine',peak:0.17,decay:0.1}); sfxTone(880,0.11,0.16,{type:'sine',peak:0.17,decay:0.14}); },
+  miss(){ sfxTone(180,0,0.16,{type:'sawtooth',peak:0.12,decay:0.16}); sfxTone(140,0.09,0.18,{type:'sawtooth',peak:0.1,decay:0.18}); },
+  nudge(){ sfxTone(300,0,0.09,{type:'triangle',peak:0.1,decay:0.09}); },
+};
+
 class Component extends DCLogic {
   state = {
     screen:'modeSelect', mode:null, stage:'tin', tin:null, lidOpen:false, pouring:false,
@@ -568,7 +629,7 @@ class Component extends DCLogic {
     e.currentTarget.setPointerCapture && e.currentTarget.setPointerCapture(e.pointerId);
     this.isDown = true;
     const p = this.local(e); this.pointer = p; this.lastX = p && p.x;
-    if(this.style()==='tap' && p){ this.f = Math.min(100,this.f+5.5); this.spawn(p.x,p.y,7); }
+    if(this.style()==='tap' && p){ this.f = Math.min(100,this.f+5.5); this.spawn(p.x,p.y,7); SFX.whisk(); }
   };
   move = (e) => {
     if(this.state.stage!=='whisk') return;
@@ -582,7 +643,11 @@ class Component extends DCLogic {
       if(Math.abs(dx) > 130){ this.f = Math.max(0,this.f-6); this.revs=[]; }
       else if(Math.abs(dx) > 5){
         const nd = dx>0?1:-1;
-        if(this.dir!==0 && nd!==this.dir) this.revs.push(performance.now());
+        if(this.dir!==0 && nd!==this.dir){
+          this.revs.push(performance.now());
+          const nowT = performance.now();
+          if(nowT - (this._lastWhiskSfx||0) > 90){ SFX.whisk(); this._lastWhiskSfx = nowT; }
+        }
         this.dir = nd;
         if(this.revs.length>=2) this.spawn(p.x,p.y,2);
       }
@@ -595,17 +660,20 @@ class Component extends DCLogic {
   tapTin = () => {
     if(this.state.stage!=='tin') return;
     if(this.state.lidOpen) return;
+    SFX.tap();
     this.setState({lidOpen:true});
     setTimeout(()=>this.setState({stage:'scoop'}),450);
   };
   tapChashaku = () => {
     if(this.state.stage!=='scoop') return;
+    SFX.tap();
     this.setState({scooping:true});
     setTimeout(()=>{ this.scooped = true; },520);
     setTimeout(()=>this.setState({stage:'pour', scooping:false, lidOpen:false}),900);
   };
   tapKettle = () => {
     if(this.state.stage!=='pour') return;
+    SFX.pour();
     this.setState({pouring:true, stage:'pouring'});
     setTimeout(()=>{
       this.f=0; this.bubbles=[]; this.revs=[]; this.t0=performance.now(); this.timeUp=false;
@@ -616,6 +684,7 @@ class Component extends DCLogic {
   finish = () => {
     const diff = Math.abs(this.f - this.state.target);
     const success = diff <= 8;
+    if(success) SFX.success(); else SFX.miss();
     this.setState(s=>({
       screen:'result', stage:'whisk', showResult:true, success,
       attempts: success ? s.attempts : s.attempts+1, showHint:false
@@ -627,22 +696,24 @@ class Component extends DCLogic {
     this.setState({showResult:false, showHint:false, screen:'whisk', stage:'whisk', froth:0, seconds:0});
   };
   toLatte = () => this.setState({showResult:false, screen:'latte', latteStep:'pick'});
-  pickSyrup = (i) => () => this.setState({syrup:SYRUPS[i], latteStep:'poured'});
+  pickSyrup = (i) => () => { SFX.tap(); this.setState({syrup:SYRUPS[i], latteStep:'poured'}); };
   bowlClick = () => {
     if(this.state.latteStep!=='poured') return;
+    SFX.pour();
     this.setState({latteStep:'matcha'});
     setTimeout(()=>this.setState({latteStep:'done'}),1250);
     setTimeout(()=>this.setState({showDone:true}),2150);
   };
   playAgain = () => {
+    SFX.tap();
     this.f=0; this.bubbles=[]; this.revs=[]; this.timeUp=false; this.scooped=false;
     this.setState({screen:'modeSelect', mode:null, stage:'tin', tin:null, lidOpen:false, syrup:null, latteStep:'pick',
       showDone:false, showResult:false, showHint:false, hintUnlocked:false, attempts:0, froth:0, seconds:20,
       target: 55+Math.random()*35});
   };
 
-  chooseCalm = () => { this.setState({ screen:'start', mode:'calm' }); };
-  chooseRush = () => { this.startRush(); };
+  chooseCalm = () => { SFX.tap(); this.setState({ screen:'start', mode:'calm' }); };
+  chooseRush = () => { SFX.tap(); this.startRush(); };
 
   startRush = () => {
     clearInterval(this.rushTimer);
@@ -671,6 +742,7 @@ class Component extends DCLogic {
 
   pickRushTin = (i) => () => {
     if(!this.state.rushActive) return;
+    SFX.tap();
     this.startRushClock();
     this.f=0; this.bubbles=[]; this.revs=[];
     this.setState({ rushTin: TINS[i].id, stage:'whisk', froth:0 });
@@ -682,6 +754,7 @@ class Component extends DCLogic {
     if(!order) return;
     const diff = Math.abs(this.state.froth - order.target);
     if(diff > RUSH_TOLERANCE){
+      SFX.nudge();
       clearTimeout(this.feedbackTimer);
       const feedback = { ok:false, text: this.state.froth < order.target ? 'Not quite — froth too thin, keep whisking.' : 'Not quite — froth too thick, keep whisking.' };
       this.setState({ rushFeedback: feedback });
@@ -693,6 +766,7 @@ class Component extends DCLogic {
 
   pickRushSyrup = (i) => () => {
     if(!this.state.rushActive || this.state.stage!=='rushPour') return;
+    SFX.pour();
     clearTimeout(this.pourTimer);
     this.setState({ rushSyrup: SYRUPS[i].id, stage:'rushPouring' });
     this.pourTimer = setTimeout(()=>this.resolveOrder(), 700);
@@ -704,6 +778,7 @@ class Component extends DCLogic {
     const tinOk = this.state.rushTin===order.tinId;
     const syrupOk = this.state.rushSyrup===order.syrupId;
     const success = tinOk && syrupOk;
+    if(success) SFX.success(); else SFX.miss();
 
     let feedback;
     if(success){
@@ -743,9 +818,10 @@ class Component extends DCLogic {
     });
   };
 
-  rushPlayAgain = () => { this.startRush(); };
+  rushPlayAgain = () => { SFX.tap(); this.startRush(); };
 
   backToModeSelect = () => {
+    SFX.tap();
     clearInterval(this.rushTimer);
     clearTimeout(this.feedbackTimer);
     clearTimeout(this.pourTimer);
