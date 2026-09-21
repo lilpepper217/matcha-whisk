@@ -16,9 +16,9 @@
 :root{
   --mw-bg-page:#e6dfcc; --mw-bg-app:#f2ead6;
   --mw-grad-1:#f7f1e1; --mw-grad-2:#efe5cd; --mw-grad-3:#e9dec2;
-  --mw-text:#3f3a2e; --mw-text-secondary:#4a4436; --mw-text-muted:#6b6350; --mw-text-faint:#8a7449;
+  --mw-text:#3f3a2e; --mw-text-secondary:#4a4436; --mw-text-muted:#6b6350; --mw-text-faint:#75633e;
   --mw-card-bg:#faf4e4; --mw-chip-bg:#efe7cf; --mw-chip-border:#ddd0ac; --mw-border-muted:#b8a578;
-  --mw-tin-label:#9a8f74; --mw-warn:#b5432f;
+  --mw-tin-label:#6c6451; --mw-warn:#b5432f;
   --mw-feedback-ok-bg:#e3ecd8; --mw-feedback-ok-text:#3f5a38;
   --mw-feedback-bad-bg:#f4ded6; --mw-feedback-bad-text:#9c4a30;
 }
@@ -27,7 +27,7 @@
   --mw-grad-1:#2b2620; --mw-grad-2:#211d18; --mw-grad-3:#191713;
   --mw-text:#ece5d3; --mw-text-secondary:#d8cfb8; --mw-text-muted:#b5aa8c; --mw-text-faint:#a6976f;
   --mw-card-bg:#2f2a21; --mw-chip-bg:#352f24; --mw-chip-border:#4a4131; --mw-border-muted:#5c5138;
-  --mw-tin-label:#8d8267; --mw-warn:#e2695a;
+  --mw-tin-label:#9e957e; --mw-warn:#e2695a;
   --mw-feedback-ok-bg:#2c3524; --mw-feedback-ok-text:#a9d18e;
   --mw-feedback-bad-bg:#3a2a22; --mw-feedback-bad-text:#e2937f;
 }
@@ -47,6 +47,9 @@ a{color:#4a6741}a:hover{color:#3a5233}
 @keyframes mwKettleIn{from{opacity:0;transform:translate(46px,110px)}to{opacity:1;transform:translate(0,0)}}
 @keyframes mwRipple{0%{transform:scale(.25);opacity:.55}100%{transform:scale(1.8);opacity:0}}
 @keyframes mwWobble{0%,100%{transform:rotate(-19deg)}50%{transform:rotate(-24deg)}}
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:0.001ms !important;animation-iteration-count:1 !important;}
+}
 </style>
 </helmet>
 <div style="width:393px;height:852px;position:relative;overflow:hidden;background:var(--mw-bg-app);font-family:'EB Garamond',Georgia,serif;color:var(--mw-text);user-select:none">
@@ -54,6 +57,10 @@ a{color:#4a6741}a:hover{color:#3a5233}
   <div style="position:absolute;inset:0;background:radial-gradient(120% 80% at 50% 0%,var(--mw-grad-1) 0%,var(--mw-grad-2) 70%,var(--mw-grad-3) 100%)"></div>
 
   <button onClick="{{ toggleTheme }}" aria-label="Toggle dark mode" style="all:unset;cursor:pointer;position:absolute;top:14px;right:14px;z-index:30;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--mw-card-bg);border:1.6px solid var(--mw-text);color:var(--mw-text);font-size:15px;line-height:1;transition:transform .15s ease" style-hover="transform:translateY(-2px)">{{ themeIcon }}</button>
+
+  <sc-if value="{{ isWhisk }}" hint-placeholder-val="{{ false }}">
+    <button onClick="{{ resetFroth }}" aria-label="Restart froth" title="Restart froth" style="all:unset;cursor:pointer;position:absolute;top:14px;left:14px;z-index:30;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--mw-card-bg);border:1.6px solid var(--mw-text);color:var(--mw-text);font-size:16px;line-height:1;transition:transform .15s ease" style-hover="transform:translateY(-2px)">⟲</button>
+  </sc-if>
 
   <div style="position:relative;height:100%;display:flex;flex-direction:column;align-items:center;padding:34px 22px 22px">
 
@@ -165,23 +172,21 @@ a{color:#4a6741}a:hover{color:#3a5233}
         </div>
 
         <sc-if value="{{ isWhisk }}" hint-placeholder-val="{{ false }}">
-          <div style="position:absolute;left:0;right:0;top:80px;display:flex;align-items:center;justify-content:center;gap:14px">
-            <span style="font-family:'Space Mono',monospace;font-size:14px;font-weight:700;letter-spacing:.5px;color:{{ secondsColor }};transition:color .3s ease">{{ seconds }}s</span>
-            <sc-if value="{{ hintDocked }}" hint-placeholder-val="{{ false }}">
+          <sc-if value="{{ hintDocked }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;left:0;right:0;top:80px;display:flex;align-items:center;justify-content:center">
               <div style="display:flex;align-items:center;gap:7px;padding:5px 10px 5px 7px;border-radius:20px;background:var(--mw-chip-bg);border:1.4px solid var(--mw-chip-border);animation:mwFade .35s ease both">
                 <div style="width:22px;height:22px;border-radius:50%;border:1.8px solid var(--mw-text);background:{{ yourColor }}"></div>
                 <span style="font-family:'Space Mono',monospace;font-size:9.5px;color:var(--mw-text-faint)">vs</span>
                 <div style="width:22px;height:22px;border-radius:50%;border:1.8px solid var(--mw-text);background:{{ targetColor }};box-shadow:0 0 0 3px rgba(184,165,120,.35)"></div>
                 <span style="font-family:'Space Mono',monospace;font-size:9.5px;font-weight:700;color:var(--mw-text-muted)">target</span>
               </div>
-            </sc-if>
-          </div>
+            </div>
+          </sc-if>
         </sc-if>
 
         <sc-if value="{{ isWhisk }}" hint-placeholder-val="{{ false }}">
-          <div style="position:absolute;left:0;right:0;bottom:8px;display:flex;flex-direction:column;align-items:center;gap:8px">
+          <div style="position:absolute;left:0;right:0;bottom:8px;display:flex;justify-content:center">
             <button onClick="{{ finish }}" style="all:unset;cursor:pointer;padding:13px 26px;border-radius:24px;background:#4a6741;color:#f7f1e1;font-family:'Space Mono',monospace;font-size:13.5px;box-shadow:0 3px 0 #35492f;transition:transform .12s ease" style-hover="background:#3f5a38" style-active="transform:translateY(2px);box-shadow:0 1px 0 #35492f">This Feels Right</button>
-            <button onClick="{{ resetFroth }}" style="all:unset;cursor:pointer;padding:8px 16px;border-radius:18px;border:1.6px solid var(--mw-border-muted);color:var(--mw-text-faint);font-family:'Space Mono',monospace;font-size:11px" style-hover="background:var(--mw-chip-bg)">Reset Froth</button>
           </div>
         </sc-if>
       </div>
@@ -304,7 +309,6 @@ a{color:#4a6741}a:hover{color:#3a5233}
             <canvas ref="{{ canvasRef }}" width="600" height="600" onPointerDown="{{ down }}" onPointerMove="{{ move }}" onPointerUp="{{ up }}" onPointerLeave="{{ up }}" style="position:relative;width:250px;height:250px;touch-action:none;cursor:{{ bowlCursor }}"></canvas>
           </div>
           <button onClick="{{ goToPour }}" style="all:unset;cursor:pointer;margin-top:12px;padding:11px 24px;border-radius:22px;background:#4a6741;color:#f7f1e1;font-family:'Space Mono',monospace;font-size:13px;box-shadow:0 3px 0 #35492f" style-hover="background:#3f5a38" style-active="transform:translateY(2px);box-shadow:0 1px 0 #35492f">Pour it →</button>
-          <button onClick="{{ resetFroth }}" style="all:unset;cursor:pointer;margin-top:8px;padding:8px 16px;border-radius:18px;border:1.6px solid var(--mw-border-muted);color:var(--mw-text-faint);font-family:'Space Mono',monospace;font-size:11px" style-hover="background:var(--mw-chip-bg)">Reset Froth</button>
         </sc-if>
 
         <sc-if value="{{ isRushPour }}" hint-placeholder-val="{{ false }}">
@@ -336,13 +340,13 @@ a{color:#4a6741}a:hover{color:#3a5233}
           </div>
           <div style="font-family:'Space Mono',monospace;font-size:10.5px;color:var(--mw-text-faint);margin-bottom:6px">pick the syrup this order calls for</div>
           <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:8px">
-            <button onClick="{{ pickRushSyrup0 }}" style="all:unset;cursor:pointer;padding:3px;border-radius:12px;border:{{ syrup0Border }};opacity:{{ pourBtnOpacity }};pointer-events:{{ pourBtnEvents }}" style-hover="transform:translateY(-2px)">
+            <button onClick="{{ pickRushSyrup0 }}" style="all:unset;cursor:pointer;padding:8px;border-radius:16px;border:{{ syrup0Border }};opacity:{{ pourBtnOpacity }};pointer-events:{{ pourBtnEvents }}" style-hover="transform:translateY(-2px)">
               <svg viewBox="0 0 52 52" width="30" height="30"><ellipse cx="26" cy="49" rx="12" ry="2.6" fill="#8a7449" opacity=".22"></ellipse><path d="M26 46c-9-4-14-12-14-20 0-6 6-10 14-10s14 4 14 10c0 8-5 16-14 20z" fill="#e0464b" stroke="#3f3a2e" stroke-width="2.4" stroke-linejoin="round"></path><circle cx="21" cy="26" r="1.7" fill="#ffe9b0"></circle><circle cx="31" cy="24" r="1.7" fill="#ffe9b0"></circle><circle cx="26" cy="34" r="1.7" fill="#ffe9b0"></circle><circle cx="34" cy="33" r="1.7" fill="#ffe9b0"></circle><circle cx="18" cy="34" r="1.7" fill="#ffe9b0"></circle><path d="M26 16c-6-2-11-1-13 2 4 3 9 3 13 1zm0 0c6-2 11-1 13 2-4 3-9 3-13 1z" fill="#5f8f43" stroke="#3f3a2e" stroke-width="2.2" stroke-linejoin="round"></path><path d="M26 16V9" stroke="#3f3a2e" stroke-width="2.4" stroke-linecap="round"></path><path d="M20 27c1-4 4-7 7-8" fill="none" stroke="#fff" stroke-width="2.2" opacity=".4" stroke-linecap="round"></path></svg>
             </button>
-            <button onClick="{{ pickRushSyrup1 }}" style="all:unset;cursor:pointer;padding:3px;border-radius:12px;border:{{ syrup1Border }};opacity:{{ pourBtnOpacity }};pointer-events:{{ pourBtnEvents }}" style-hover="transform:translateY(-2px)">
+            <button onClick="{{ pickRushSyrup1 }}" style="all:unset;cursor:pointer;padding:8px;border-radius:16px;border:{{ syrup1Border }};opacity:{{ pourBtnOpacity }};pointer-events:{{ pourBtnEvents }}" style-hover="transform:translateY(-2px)">
               <svg viewBox="0 0 52 52" width="30" height="30"><ellipse cx="26" cy="49" rx="13" ry="2.6" fill="#8a7449" opacity=".22"></ellipse><circle cx="18" cy="32" r="10" fill="#2f4a9c" stroke="#3f3a2e" stroke-width="2.4"></circle><circle cx="34" cy="34" r="9" fill="#25397c" stroke="#3f3a2e" stroke-width="2.4"></circle><circle cx="27" cy="21" r="10" fill="#3a58b4" stroke="#3f3a2e" stroke-width="2.4"></circle><path d="M27 21l-3-3 3 1 3-1z" fill="#1a2a5c"></path><circle cx="23" cy="17" r="2.4" fill="#fff" opacity=".45"></circle><path d="M40 22c4-3 7-3 9-1-3 4-7 5-9 3z" fill="#5f8f43" stroke="#3f3a2e" stroke-width="2.2" stroke-linejoin="round"></path></svg>
             </button>
-            <button onClick="{{ pickRushSyrup2 }}" style="all:unset;cursor:pointer;padding:3px;border-radius:12px;border:{{ syrup2Border }};opacity:{{ pourBtnOpacity }};pointer-events:{{ pourBtnEvents }}" style-hover="transform:translateY(-2px)">
+            <button onClick="{{ pickRushSyrup2 }}" style="all:unset;cursor:pointer;padding:8px;border-radius:16px;border:{{ syrup2Border }};opacity:{{ pourBtnOpacity }};pointer-events:{{ pourBtnEvents }}" style-hover="transform:translateY(-2px)">
               <svg viewBox="0 0 52 52" width="30" height="30"><ellipse cx="26" cy="49" rx="12" ry="2.6" fill="#8a7449" opacity=".22"></ellipse><path d="M30 14c9 1 14 9 12 18-2 8-10 14-18 12S12 32 16 24s8-11 14-10z" fill="#f2b330" stroke="#3f3a2e" stroke-width="2.4" stroke-linejoin="round"></path><path d="M22 24c2-4 6-6 9-6" fill="none" stroke="#fff" stroke-width="2.4" opacity=".45" stroke-linecap="round"></path><path d="M31 13c4-4 9-5 12-3-2 5-7 7-11 6z" fill="#5f8f43" stroke="#3f3a2e" stroke-width="2.2" stroke-linejoin="round"></path></svg>
             </button>
           </div>
@@ -509,7 +513,7 @@ const SFX = {
 class Component extends DCLogic {
   state = {
     screen:'modeSelect', mode:null, stage:'tin', tin:null, lidOpen:false, pouring:false,
-    froth:0, seconds:20, attempts:0, showResult:false, showHint:false,
+    froth:0, attempts:0, showResult:false, showHint:false,
     success:false, target: 55 + Math.random()*35, syrup:null, latteStep:'pick', showDone:false,
     rushOrders:[], rushScore:0, rushSeconds:RUSH_SECONDS, rushActive:false, rushClockRunning:false,
     rushTin:null, rushSyrup:null, rushBest:0, rushIsNewBest:false, rushFeedback:null,
@@ -517,7 +521,7 @@ class Component extends DCLogic {
   };
 
   f = 0; bubbles = []; revs = []; pointer = null; isDown = false;
-  lastX = null; dir = 0; t0 = 0; lastTick = 0; beat = 0; timeUp = false;
+  lastX = null; dir = 0; lastTick = 0; beat = 0;
   noise = Array.from({length:70},()=>({a:Math.random()*Math.PI*2,r:Math.random(),s:3+Math.random()*7}));
 
   loop = (t) => {
@@ -573,14 +577,7 @@ class Component extends DCLogic {
     this.bubbles.forEach(b=>{ b.a -= dt/1400; b.y -= dt/260; });
     this.bubbles = this.bubbles.filter(b=>b.a>0).slice(-260);
 
-    if(this.state.mode==='rush'){
-      if(Math.abs(this.f-this.state.froth)>0.8) this.setState({froth:this.f});
-      return;
-    }
-
-    const left = Math.max(0, 20 - Math.floor((now-this.t0)/1000));
-    if(left!==this.state.seconds || Math.abs(this.f-this.state.froth)>0.8) this.setState({seconds:left, froth:this.f});
-    if(left===0 && !this.timeUp){ this.timeUp = true; this.finish(); }
+    if(Math.abs(this.f-this.state.froth)>0.8) this.setState({froth:this.f});
   }
 
   spawn(x,y,n){
@@ -710,8 +707,8 @@ class Component extends DCLogic {
     SFX.pour();
     this.setState({pouring:true, stage:'pouring'});
     setTimeout(()=>{
-      this.f=0; this.bubbles=[]; this.revs=[]; this.t0=performance.now(); this.timeUp=false;
-      this.setState({pouring:false, stage:'whisk', screen:'whisk', seconds:0, froth:0});
+      this.f=0; this.bubbles=[]; this.revs=[];
+      this.setState({pouring:false, stage:'whisk', screen:'whisk', froth:0});
     },2400);
   };
 
@@ -731,8 +728,8 @@ class Component extends DCLogic {
     this.setState({froth:0});
   };
   retry = () => {
-    this.f=0; this.bubbles=[]; this.revs=[]; this.t0=performance.now(); this.timeUp=false;
-    this.setState({showResult:false, showHint:false, screen:'whisk', stage:'whisk', froth:0, seconds:0});
+    this.f=0; this.bubbles=[]; this.revs=[];
+    this.setState({showResult:false, showHint:false, screen:'whisk', stage:'whisk', froth:0});
   };
   toLatte = () => this.setState({showResult:false, screen:'latte', latteStep:'pick'});
   pickSyrup = (i) => () => { SFX.tap(); this.setState({syrup:SYRUPS[i], latteStep:'poured'}); };
@@ -745,9 +742,9 @@ class Component extends DCLogic {
   };
   playAgain = () => {
     SFX.tap();
-    this.f=0; this.bubbles=[]; this.revs=[]; this.timeUp=false; this.scooped=false;
+    this.f=0; this.bubbles=[]; this.revs=[]; this.scooped=false;
     this.setState({screen:'modeSelect', mode:null, stage:'tin', tin:null, lidOpen:false, syrup:null, latteStep:'pick',
-      showDone:false, showResult:false, showHint:false, hintUnlocked:false, attempts:0, froth:0, seconds:20,
+      showDone:false, showResult:false, showHint:false, hintUnlocked:false, attempts:0, froth:0,
       target: 55+Math.random()*35});
   };
 
@@ -980,8 +977,6 @@ class Component extends DCLogic {
       rushResultNote: s.rushIsNewBest ? 'A new best run!' : ('Best run: '+(s.rushBest||0)+' orders.'),
       rushPlayAgain:this.rushPlayAgain,
       backToModeSelect:this.backToModeSelect,
-      seconds: s.seconds,
-      secondsColor: s.seconds <= 5 ? 'var(--mw-warn)' : 'var(--mw-text-muted)',
       canvasRef: (el)=>{ this.canvas = el; if(el) this.ensureLoop(); },
       bowlCursor: st==='whisk' ? 'grab' : 'default',
       pick0:this.pick(0), pick1:this.pick(1), pick2:this.pick(2), pick3:this.pick(3),
