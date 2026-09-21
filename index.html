@@ -171,9 +171,21 @@ a{color:#4a6741}a:hover{color:#3a5233}
           <sc-if value="{{ hintDocked }}" hint-placeholder-val="{{ false }}">
             <div style="position:absolute;left:0;right:0;top:80px;display:flex;align-items:center;justify-content:center">
               <div style="display:flex;align-items:center;gap:7px;padding:5px 10px 5px 7px;border-radius:20px;background:var(--mw-chip-bg);border:1.4px solid var(--mw-chip-border);animation:mwFade .35s ease both">
-                <div style="width:22px;height:22px;border-radius:50%;border:1.8px solid var(--mw-text);background:{{ yourColor }}"></div>
+                <div style="position:relative;width:22px;height:22px;border-radius:50%;border:1.8px solid var(--mw-text);background:{{ yourColor }};overflow:hidden">
+                  <svg viewBox="0 0 100 100" style="position:absolute;inset:0;width:100%;height:100%">
+                    <sc-for list="{{ yourDots }}" as="d" hint-placeholder-count="10">
+                      <circle cx="{{ d.cx }}" cy="{{ d.cy }}" r="{{ d.r }}" fill="{{ d.fill }}" stroke="{{ d.stroke }}" stroke-width="1"></circle>
+                    </sc-for>
+                  </svg>
+                </div>
                 <span style="font-family:'Space Mono',monospace;font-size:9.5px;color:var(--mw-text-faint)">vs</span>
-                <div style="width:22px;height:22px;border-radius:50%;border:1.8px solid var(--mw-text);background:{{ targetColor }};box-shadow:0 0 0 3px rgba(184,165,120,.35)"></div>
+                <div style="position:relative;width:22px;height:22px;border-radius:50%;border:1.8px solid var(--mw-text);background:{{ targetColor }};box-shadow:0 0 0 3px rgba(184,165,120,.35);overflow:hidden">
+                  <svg viewBox="0 0 100 100" style="position:absolute;inset:0;width:100%;height:100%">
+                    <sc-for list="{{ targetDots }}" as="d" hint-placeholder-count="10">
+                      <circle cx="{{ d.cx }}" cy="{{ d.cy }}" r="{{ d.r }}" fill="{{ d.fill }}" stroke="{{ d.stroke }}" stroke-width="1"></circle>
+                    </sc-for>
+                  </svg>
+                </div>
                 <span style="font-family:'Space Mono',monospace;font-size:9.5px;font-weight:700;color:var(--mw-text-muted)">target</span>
               </div>
             </div>
@@ -369,15 +381,39 @@ a{color:#4a6741}a:hover{color:#3a5233}
 
         <sc-if value="{{ showCompare }}" hint-placeholder-val="{{ false }}">
           <div style="margin-top:18px;display:flex;gap:14px;justify-content:center">
-            <div style="display:flex;flex-direction:column;gap:6px;align-items:center"><div style="width:66px;height:66px;border-radius:50%;border:2.4px solid var(--mw-text);background:{{ yourColor }}"></div><span style="font-family:'Space Mono',monospace;font-size:10px;color:var(--mw-text-muted)">yours</span></div>
-            <div style="display:flex;flex-direction:column;gap:6px;align-items:center"><div style="width:66px;height:66px;border-radius:50%;border:2.4px solid var(--mw-text);background:{{ targetColor }}"></div><span style="font-family:'Space Mono',monospace;font-size:10px;color:var(--mw-text-muted)">target</span></div>
+            <div style="display:flex;flex-direction:column;gap:6px;align-items:center">
+              <div style="position:relative;width:66px;height:66px;border-radius:50%;border:2.4px solid var(--mw-text);background:{{ yourColor }};overflow:hidden">
+                <svg viewBox="0 0 100 100" style="position:absolute;inset:0;width:100%;height:100%">
+                  <sc-for list="{{ yourDots }}" as="d" hint-placeholder-count="10">
+                    <circle cx="{{ d.cx }}" cy="{{ d.cy }}" r="{{ d.r }}" fill="{{ d.fill }}" stroke="{{ d.stroke }}" stroke-width="1"></circle>
+                  </sc-for>
+                </svg>
+              </div>
+              <span style="font-family:'Space Mono',monospace;font-size:10px;color:var(--mw-text-muted)">yours</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px;align-items:center">
+              <div style="position:relative;width:66px;height:66px;border-radius:50%;border:2.4px solid var(--mw-text);background:{{ targetColor }};overflow:hidden">
+                <svg viewBox="0 0 100 100" style="position:absolute;inset:0;width:100%;height:100%">
+                  <sc-for list="{{ targetDots }}" as="d" hint-placeholder-count="10">
+                    <circle cx="{{ d.cx }}" cy="{{ d.cy }}" r="{{ d.r }}" fill="{{ d.fill }}" stroke="{{ d.stroke }}" stroke-width="1"></circle>
+                  </sc-for>
+                </svg>
+              </div>
+              <span style="font-family:'Space Mono',monospace;font-size:10px;color:var(--mw-text-muted)">target</span>
+            </div>
           </div>
         </sc-if>
 
         <sc-if value="{{ showHint }}" hint-placeholder-val="{{ false }}">
           <div style="margin-top:18px;padding:14px;border-radius:16px;background:var(--mw-chip-bg);border:1.6px dashed var(--mw-border-muted);animation:mwFade .3s ease both">
             <div style="font-family:'Space Mono',monospace;font-size:10.5px;letter-spacing:.6px;text-transform:uppercase;color:var(--mw-text-faint)">whisk toward this</div>
-            <div style="margin:10px auto 0;width:88px;height:88px;border-radius:50%;border:2.6px solid var(--mw-text);background:{{ targetColor }};box-shadow:inset 0 -8px 16px rgba(0,0,0,.12)"></div>
+            <div style="position:relative;margin:10px auto 0;width:88px;height:88px;border-radius:50%;border:2.6px solid var(--mw-text);background:{{ targetColor }};box-shadow:inset 0 -8px 16px rgba(0,0,0,.12);overflow:hidden">
+              <svg viewBox="0 0 100 100" style="position:absolute;inset:0;width:100%;height:100%">
+                <sc-for list="{{ targetDots }}" as="d" hint-placeholder-count="10">
+                  <circle cx="{{ d.cx }}" cy="{{ d.cy }}" r="{{ d.r }}" fill="{{ d.fill }}" stroke="{{ d.stroke }}" stroke-width="1"></circle>
+                </sc-for>
+              </svg>
+            </div>
             <div style="margin-top:10px;font-family:'Space Mono',monospace;font-size:11.5px;color:var(--mw-text-secondary)">match this froth colour</div>
           </div>
         </sc-if>
@@ -443,6 +479,21 @@ function mix(c1,c2,t){
   return 'rgb('+Math.round(lerp(A[0],B[0],t))+','+Math.round(lerp(A[1],B[1],t))+','+Math.round(lerp(A[2],B[2],t))+')';
 }
 const frothColor = v => mix('#3a5233','#c2d6a4',Math.max(0,Math.min(1,v/100)));
+
+const BUBBLE_POS = [
+  {cx:58.0, cy:50.0, r:3.2}, {cx:39.7, cy:59.4, r:3.7}, {cx:51.6, cy:32.1, r:4.2},
+  {cx:63.0, cy:66.9, r:3.2}, {cx:26.2, cy:45.8, r:3.7}, {cx:72.5, cy:35.7, r:4.2},
+  {cx:42.5, cy:78.0, r:3.2}, {cx:35.6, cy:22.3, r:3.7}, {cx:81.2, cy:61.4, r:4.2},
+  {cx:17.6, cy:63.4, r:3.2}
+];
+const bubbleDots = v => {
+  const filled = Math.round(Math.max(0,Math.min(100,v))/100*BUBBLE_POS.length);
+  return BUBBLE_POS.map((p,i)=>({
+    cx:p.cx, cy:p.cy, r:p.r,
+    fill: i<filled ? 'rgba(255,255,255,.88)' : 'rgba(0,0,0,.16)',
+    stroke: i<filled ? 'rgba(0,0,0,.35)' : 'none'
+  }));
+};
 
 const RUSH_SECONDS = 40;
 const RUSH_TOLERANCE = 15;
@@ -1003,6 +1054,8 @@ class Component extends DCLogic {
       showCompare: !s.success && !s.showHint,
       yourColor: frothColor(s.froth),
       targetColor: frothColor(s.target),
+      yourDots: bubbleDots(s.froth),
+      targetDots: bubbleDots(s.target),
       showHint: s.showHint,
       hintDocked: !!s.hintUnlocked,
       hintAvailable: hintAfter>0 && !s.success && s.attempts>=hintAfter && !s.showHint,
