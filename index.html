@@ -32,7 +32,7 @@
   --mw-feedback-ok-bg:#2c3524; --mw-feedback-ok-text:#a9d18e;
   --mw-feedback-bad-bg:#3a2a22; --mw-feedback-bad-text:#e2937f;
 }
-html,body{margin:0;padding:0;background:var(--mw-bg-app);min-height:100vh;min-height:100dvh;display:flex;align-items:center;justify-content:center;overflow:hidden}
+html,body{margin:0;padding:0;background:var(--mw-bg-app)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 a{color:#4a6741}a:hover{color:#3a5233}
 @keyframes mwFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
@@ -53,7 +53,7 @@ a{color:#4a6741}a:hover{color:#3a5233}
 }
 </style>
 </helmet>
-<div style="width:393px;height:852px;flex:none;position:relative;overflow:hidden;background:var(--mw-bg-app);font-family:'EB Garamond',Georgia,serif;color:var(--mw-text);user-select:none;transform:scale(var(--mw-scale,1));transform-origin:center center">
+<div style="width:393px;height:852px;flex:none;position:relative;overflow:hidden;background:var(--mw-bg-app);font-family:'EB Garamond',Georgia,serif;color:var(--mw-text);user-select:none">
 
   <div style="position:absolute;inset:0;background:radial-gradient(120% 80% at 50% 0%,var(--mw-grad-1) 0%,var(--mw-grad-2) 70%,var(--mw-grad-3) 100%)"></div>
 
@@ -682,12 +682,6 @@ class Component extends DCLogic {
     if(savedInitials && /^[A-Z]{3}$/.test(savedInitials)){
       this.setState({ rushInitials: savedInitials.split(''), hasSavedInitials: true });
     }
-    this.scaleProbe = document.createElement('div');
-    this.scaleProbe.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:100vh;height:100lvh;visibility:hidden;pointer-events:none;z-index:-1';
-    document.body.appendChild(this.scaleProbe);
-    this.updateScale();
-    window.addEventListener('resize', this.updateScale);
-    window.addEventListener('orientationchange', this.updateScale);
     this.loadLeaderboard();
     this.ensureLoop();
   }
@@ -722,12 +716,6 @@ class Component extends DCLogic {
     this.setState({ rushScoreSubmitted: true, hasSavedInitials: true, editingInitials: false });
   };
   toggleEditInitials = () => { SFX.tap(); this.setState(s=>({ editingInitials: !s.editingInitials })); };
-  updateScale = () => {
-    const margin = 16;
-    const h = this.scaleProbe ? this.scaleProbe.getBoundingClientRect().height : window.innerHeight;
-    const scale = Math.min((window.innerWidth-margin)/393, (h-margin)/852, 1.8);
-    document.documentElement.style.setProperty('--mw-scale', Math.max(0.4, scale));
-  };
   toggleTheme = () => {
     SFX.tap();
     const next = this.state.theme==='dark' ? 'light' : 'dark';
@@ -737,9 +725,6 @@ class Component extends DCLogic {
   };
   componentWillUnmount(){
     cancelAnimationFrame(this.raf); this.raf = null; clearInterval(this.rushTimer); clearTimeout(this.feedbackTimer); clearTimeout(this.pourTimer);
-    window.removeEventListener('resize', this.updateScale);
-    window.removeEventListener('orientationchange', this.updateScale);
-    if(this.scaleProbe && this.scaleProbe.parentNode) this.scaleProbe.parentNode.removeChild(this.scaleProbe);
   }
 
   style(){ return this.props.whiskStyle || 'drag'; }
