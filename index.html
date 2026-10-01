@@ -683,7 +683,7 @@ class Component extends DCLogic {
       this.setState({ rushInitials: savedInitials.split(''), hasSavedInitials: true });
     }
     this.scaleProbe = document.createElement('div');
-    this.scaleProbe.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:100vh;visibility:hidden;pointer-events:none;z-index:-1';
+    this.scaleProbe.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:100vh;height:100lvh;visibility:hidden;pointer-events:none;z-index:-1';
     document.body.appendChild(this.scaleProbe);
     this.updateScale();
     window.addEventListener('resize', this.updateScale);
