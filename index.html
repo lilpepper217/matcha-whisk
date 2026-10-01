@@ -32,7 +32,7 @@
   --mw-feedback-ok-bg:#2c3524; --mw-feedback-ok-text:#a9d18e;
   --mw-feedback-bad-bg:#3a2a22; --mw-feedback-bad-text:#e2937f;
 }
-html,body{margin:0;padding:0;background:var(--mw-bg-page);min-height:100vh;min-height:100dvh;display:flex;align-items:center;justify-content:center;overflow:hidden}
+html,body{margin:0;padding:0;background:var(--mw-bg-page);min-height:100vh;min-height:100dvh;display:flex;align-items:center;justify-content:center;overflow-y:auto;overflow-x:hidden}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 a{color:#4a6741}a:hover{color:#3a5233}
 @keyframes mwFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
@@ -685,6 +685,9 @@ class Component extends DCLogic {
     this.updateScale();
     window.addEventListener('resize', this.updateScale);
     window.addEventListener('orientationchange', this.updateScale);
+    if(window.visualViewport) window.visualViewport.addEventListener('resize', this.updateScale);
+    window.scrollTo(0,1);
+    setTimeout(() => { window.scrollTo(0,1); this.updateScale(); }, 300);
     this.loadLeaderboard();
     this.ensureLoop();
   }
@@ -735,6 +738,7 @@ class Component extends DCLogic {
     cancelAnimationFrame(this.raf); this.raf = null; clearInterval(this.rushTimer); clearTimeout(this.feedbackTimer); clearTimeout(this.pourTimer);
     window.removeEventListener('resize', this.updateScale);
     window.removeEventListener('orientationchange', this.updateScale);
+    if(window.visualViewport) window.visualViewport.removeEventListener('resize', this.updateScale);
   }
 
   style(){ return this.props.whiskStyle || 'drag'; }
