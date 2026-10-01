@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Matcha Whisk</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./support.js"></script>
 </head>
 <body>
@@ -448,6 +449,17 @@ a{color:#4a6741}a:hover{color:#3a5233}
         <div style="font-family:'Space Mono',monospace;font-size:10.5px;letter-spacing:1px;text-transform:uppercase;color:var(--mw-text-faint)">time's up</div>
         <div style="margin-top:8px;font-size:38px;line-height:1.1">{{ rushScore }} orders</div>
         <p style="margin:12px 0 0;font-family:'Space Mono',monospace;font-size:12px;line-height:1.6;color:var(--mw-text-secondary)">{{ rushResultNote }}</p>
+        <sc-if value="{{ hasLeaderboard }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:16px;padding:12px 14px;border-radius:16px;background:var(--mw-chip-bg);border:1.4px solid var(--mw-chip-border);text-align:left">
+            <div style="font-family:'Space Mono',monospace;font-size:9.5px;letter-spacing:.6px;text-transform:uppercase;color:var(--mw-text-faint);text-align:center;margin-bottom:8px">Leaderboard</div>
+            <sc-for list="{{ leaderboard }}" as="row" hint-placeholder-count="5">
+              <div style="display:flex;align-items:center;justify-content:space-between;font-family:'Space Mono',monospace;font-size:11px;padding:3px 0;color:var(--mw-text-secondary)">
+                <span>{{ row.rank }}. {{ row.name }}</span>
+                <span style="font-weight:700">{{ row.score }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
         <div style="margin-top:20px;display:flex;flex-direction:column;gap:10px;align-items:center">
           <button onClick="{{ rushPlayAgain }}" style="all:unset;cursor:pointer;padding:13px 24px;border-radius:24px;background:#4a6741;color:#f7f1e1;font-family:'Space Mono',monospace;font-size:13.5px;box-shadow:0 3px 0 #35492f" style-hover="background:#3f5a38" style-active="transform:translateY(2px);box-shadow:0 1px 0 #35492f">Play Again</button>
           <button onClick="{{ backToModeSelect }}" style="all:unset;cursor:pointer;padding:11px 20px;border-radius:22px;border:2px solid var(--mw-border-muted);color:var(--mw-text-faint);font-family:'Space Mono',monospace;font-size:12px" style-hover="background:var(--mw-chip-bg)">Back to Menu</button>
@@ -471,6 +483,10 @@ const SYRUPS = [
   {id:'blueberry', name:'blueberry', color:'#3a4f9e', drink:'Blueberry Matcha Latte'},
   {id:'mango', name:'mango', color:'#e8a52c', drink:'Mango Matcha Latte'}
 ];
+
+const SUPABASE_URL = 'https://xfcyjxuxxltwjyzuiogc.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_-x_jU3h3WMNTMr5C5r2xZA_vVtst4we';
+const sb = (typeof window!=='undefined' && window.supabase) ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 
 function lerp(a,b,t){return a+(b-a)*t;}
 function mix(c1,c2,t){
@@ -572,7 +588,7 @@ class Component extends DCLogic {
     success:false, target: 55 + Math.random()*35, syrup:null, latteStep:'pick', showDone:false,
     rushOrders:[], rushScore:0, rushSeconds:RUSH_SECONDS, rushActive:false, rushClockRunning:false,
     rushTin:null, rushSyrup:null, rushBest:0, rushIsNewBest:false, rushFeedback:null,
-    theme:'light'
+    theme:'light', leaderboard:[]
   };
 
   f = 0; bubbles = []; revs = []; pointer = null; isDown = false;
@@ -609,9 +625,22 @@ class Component extends DCLogic {
     this.updateScale();
     window.addEventListener('resize', this.updateScale);
     window.addEventListener('orientationchange', this.updateScale);
+    this.loadLeaderboard();
     this.ensureLoop();
   }
   componentDidUpdate(){ this.ensureLoop(); }
+  loadLeaderboard = async () => {
+    if(!sb) return;
+    try{
+      const { data, error } = await sb.from('leaderboard').select('name,score').order('score',{ascending:false}).limit(10);
+      if(!error && data) this.setState({ leaderboard: data });
+    }catch(e){}
+  };
+  submitScore = async (score) => {
+    if(!sb || score<=0) return;
+    try{ await sb.from('leaderboard').insert({ score, name:'anon' }); }catch(e){}
+    this.loadLeaderboard();
+  };
   updateScale = () => {
     const margin = 16;
     const scale = Math.min((window.innerWidth-margin)/393, (window.innerHeight-margin)/852, 1.8);
@@ -912,6 +941,7 @@ class Component extends DCLogic {
   };
 
   endRush = () => {
+    this.submitScore(this.state.rushScore);
     this.setState(s=>{
       const prevBest = s.rushBest||0;
       const isNewBest = s.rushScore > prevBest;
@@ -1041,6 +1071,8 @@ class Component extends DCLogic {
       rushFeedbackColor: s.rushFeedback && s.rushFeedback.ok ? 'var(--mw-feedback-ok-text)' : 'var(--mw-feedback-bad-text)',
       showRushResult: s.screen==='rushResult',
       rushResultNote: s.rushIsNewBest ? 'A new best run!' : ('Best run: '+(s.rushBest||0)+' orders.'),
+      hasLeaderboard: s.leaderboard && s.leaderboard.length>0,
+      leaderboard: (s.leaderboard||[]).map((row,i)=>({ rank:i+1, name:row.name||'anon', score:row.score })),
       rushPlayAgain:this.rushPlayAgain,
       backToModeSelect:this.backToModeSelect,
       canvasRef: (el)=>{ this.canvas = el; if(el) this.ensureLoop(); },
