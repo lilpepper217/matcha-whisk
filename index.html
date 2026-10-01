@@ -449,6 +449,29 @@ a{color:#4a6741}a:hover{color:#3a5233}
         <div style="font-family:'Space Mono',monospace;font-size:10.5px;letter-spacing:1px;text-transform:uppercase;color:var(--mw-text-faint)">time's up</div>
         <div style="margin-top:8px;font-size:38px;line-height:1.1">{{ rushScore }} orders</div>
         <p style="margin:12px 0 0;font-family:'Space Mono',monospace;font-size:12px;line-height:1.6;color:var(--mw-text-secondary)">{{ rushResultNote }}</p>
+        <sc-if value="{{ showInitialsEntry }}" hint-placeholder-val="{{ true }}">
+          <div style="margin-top:16px;display:flex;flex-direction:column;align-items:center;gap:8px">
+            <div style="font-family:'Space Mono',monospace;font-size:9.5px;letter-spacing:.6px;text-transform:uppercase;color:var(--mw-text-faint)">enter your initials</div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:2px">
+                <button onClick="{{ cycleUp0 }}" style="all:unset;cursor:pointer;color:var(--mw-text-faint);font-size:14px;padding:2px 8px">▲</button>
+                <div style="font-family:'Space Mono',monospace;font-size:22px;font-weight:700;width:28px;text-align:center">{{ rushInitials0 }}</div>
+                <button onClick="{{ cycleDown0 }}" style="all:unset;cursor:pointer;color:var(--mw-text-faint);font-size:14px;padding:2px 8px">▼</button>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:2px">
+                <button onClick="{{ cycleUp1 }}" style="all:unset;cursor:pointer;color:var(--mw-text-faint);font-size:14px;padding:2px 8px">▲</button>
+                <div style="font-family:'Space Mono',monospace;font-size:22px;font-weight:700;width:28px;text-align:center">{{ rushInitials1 }}</div>
+                <button onClick="{{ cycleDown1 }}" style="all:unset;cursor:pointer;color:var(--mw-text-faint);font-size:14px;padding:2px 8px">▼</button>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:2px">
+                <button onClick="{{ cycleUp2 }}" style="all:unset;cursor:pointer;color:var(--mw-text-faint);font-size:14px;padding:2px 8px">▲</button>
+                <div style="font-family:'Space Mono',monospace;font-size:22px;font-weight:700;width:28px;text-align:center">{{ rushInitials2 }}</div>
+                <button onClick="{{ cycleDown2 }}" style="all:unset;cursor:pointer;color:var(--mw-text-faint);font-size:14px;padding:2px 8px">▼</button>
+              </div>
+            </div>
+            <button onClick="{{ submitRushScore }}" style="all:unset;cursor:pointer;margin-top:4px;padding:9px 20px;border-radius:20px;background:#4a6741;color:#f7f1e1;font-family:'Space Mono',monospace;font-size:12px;box-shadow:0 3px 0 #35492f" style-hover="background:#3f5a38" style-active="transform:translateY(2px);box-shadow:0 1px 0 #35492f">Submit Score</button>
+          </div>
+        </sc-if>
         <sc-if value="{{ hasLeaderboard }}" hint-placeholder-val="{{ false }}">
           <div style="margin-top:16px;padding:12px 14px;border-radius:16px;background:var(--mw-chip-bg);border:1.4px solid var(--mw-chip-border);text-align:left">
             <div style="font-family:'Space Mono',monospace;font-size:9.5px;letter-spacing:.6px;text-transform:uppercase;color:var(--mw-text-faint);text-align:center;margin-bottom:8px">Leaderboard</div>
@@ -588,7 +611,7 @@ class Component extends DCLogic {
     success:false, target: 55 + Math.random()*35, syrup:null, latteStep:'pick', showDone:false,
     rushOrders:[], rushScore:0, rushSeconds:RUSH_SECONDS, rushActive:false, rushClockRunning:false,
     rushTin:null, rushSyrup:null, rushBest:0, rushIsNewBest:false, rushFeedback:null,
-    theme:'light', leaderboard:[]
+    theme:'light', leaderboard:[], rushInitials:['A','A','A'], rushScoreSubmitted:false
   };
 
   f = 0; bubbles = []; revs = []; pointer = null; isDown = false;
@@ -636,10 +659,25 @@ class Component extends DCLogic {
       if(!error && data) this.setState({ leaderboard: data });
     }catch(e){}
   };
-  submitScore = async (score) => {
+  submitScore = async (score, name) => {
     if(!sb || score<=0) return;
-    try{ await sb.from('leaderboard').insert({ score, name:'anon' }); }catch(e){}
+    try{ await sb.from('leaderboard').insert({ score, name: name||'anon' }); }catch(e){}
     this.loadLeaderboard();
+  };
+  cycleInitial = (i, dir) => () => {
+    SFX.tap();
+    this.setState(s=>{
+      const arr = s.rushInitials.slice();
+      const code = ((arr[i].charCodeAt(0) - 65 + dir + 26) % 26) + 65;
+      arr[i] = String.fromCharCode(code);
+      return { rushInitials: arr };
+    });
+  };
+  submitRushScore = () => {
+    if(this.state.rushScoreSubmitted) return;
+    SFX.tap();
+    this.submitScore(this.state.rushScore, this.state.rushInitials.join(''));
+    this.setState({ rushScoreSubmitted: true });
   };
   updateScale = () => {
     const margin = 16;
@@ -856,7 +894,8 @@ class Component extends DCLogic {
       screen:'rush', mode:'rush', stage:'rushPick',
       rushOrders: orders, rushScore:0, rushSeconds:RUSH_SECONDS,
       rushActive:true, rushClockRunning:false, rushTin:null, rushSyrup:null, froth:0, rushFeedback:null,
-      showResult:false, showHint:false, success:false, showDone:false
+      showResult:false, showHint:false, success:false, showDone:false,
+      rushInitials:['A','A','A'], rushScoreSubmitted:false
     });
   };
 
@@ -941,7 +980,6 @@ class Component extends DCLogic {
   };
 
   endRush = () => {
-    this.submitScore(this.state.rushScore);
     this.setState(s=>{
       const prevBest = s.rushBest||0;
       const isNewBest = s.rushScore > prevBest;
@@ -1073,6 +1111,12 @@ class Component extends DCLogic {
       rushResultNote: s.rushIsNewBest ? 'A new best run!' : ('Best run: '+(s.rushBest||0)+' orders.'),
       hasLeaderboard: s.leaderboard && s.leaderboard.length>0,
       leaderboard: (s.leaderboard||[]).map((row,i)=>({ rank:i+1, name:row.name||'anon', score:row.score })),
+      showInitialsEntry: !s.rushScoreSubmitted,
+      rushInitials0: s.rushInitials[0], rushInitials1: s.rushInitials[1], rushInitials2: s.rushInitials[2],
+      cycleUp0:this.cycleInitial(0,1), cycleDown0:this.cycleInitial(0,-1),
+      cycleUp1:this.cycleInitial(1,1), cycleDown1:this.cycleInitial(1,-1),
+      cycleUp2:this.cycleInitial(2,1), cycleDown2:this.cycleInitial(2,-1),
+      submitRushScore:this.submitRushScore,
       rushPlayAgain:this.rushPlayAgain,
       backToModeSelect:this.backToModeSelect,
       canvasRef: (el)=>{ this.canvas = el; if(el) this.ensureLoop(); },
