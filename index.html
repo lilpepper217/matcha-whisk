@@ -81,7 +81,7 @@ a{color:#4a6741}a:hover{color:#3a5233}
         </button>
         <button onClick="{{ chooseRush }}" style="all:unset;cursor:pointer;padding:18px 20px;border-radius:20px;background:#4a6741;color:#f7f1e1;text-align:center;box-shadow:0 3px 0 #35492f;transition:transform .12s ease" style-hover="background:#3f5a38" style-active="transform:translateY(2px);box-shadow:0 1px 0 #35492f">
           <div style="font-size:20px;font-weight:400">Order Rush</div>
-          <div style="margin-top:6px;font-family:'Space Mono',monospace;font-size:11px;opacity:.85">serve as many orders as you can in 30s</div>
+          <div style="margin-top:6px;font-family:'Space Mono',monospace;font-size:11px;opacity:.85">serve as many orders as you can in 40s</div>
         </button>
         <sc-if value="{{ hasRushBest }}" hint-placeholder-val="{{ false }}">
           <div style="text-align:center;font-family:'Space Mono',monospace;font-size:10.5px;color:var(--mw-text-faint)">best run: {{ rushBest }} orders</div>
@@ -552,9 +552,9 @@ const RUSH_FEEDBACK_MS = 2400;
 // into the hard tiers. Each order locks in its own tolerance/target-range at creation
 // time so a mid-run score change never retroactively changes an order already queued.
 function tierFor(score){
-  if(score < 3) return { tolerance: 20, rangeMode:'easy', label:'warmup' };
-  if(score < 7) return { tolerance: 15, rangeMode:'full', label:'standard' };
-  if(score < 12) return { tolerance: 12, rangeMode:'extreme', label:'tricky' };
+  if(score < 2) return { tolerance: 20, rangeMode:'easy', label:'warmup' };
+  if(score < 5) return { tolerance: 15, rangeMode:'full', label:'standard' };
+  if(score < 8) return { tolerance: 12, rangeMode:'extreme', label:'tricky' };
   return { tolerance: 10, rangeMode:'extreme', label:'expert' };
 }
 const TIER_TOASTS = {
